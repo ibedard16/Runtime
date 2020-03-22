@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      shell: cmd
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade pipenv
+        pipenv sync --dev
+    - name: Build release ${{ github.event.release.tag_name }}
+      shell: cmd
+      env:
+        MEG_RUNTIME_PKG_VERSION: ${{ github.event.release.tag_name }}
+      run: |
+        pipenv run setup.py sdist bdist_wheel
+    - name: Upload release ${{ github.event.release.tag_name }}
+      shell: cmd
+      run: |
+        echo TODO

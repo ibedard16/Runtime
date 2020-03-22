@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build",
+      "type": "shell",
+      "windows": {
+        "command": "py -3 -m pipenv run setup.py sdist bdist_wheel"
+      },
+      "command": "python3 -m pipenv run setup.py sdist bdist_wheel",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Sync",
+      "type": "shell",
+      "windows": {
+        "command": "py -3 -m pipenv sync --dev"
+      },
+      "command": "python3 -m pipenv sync --dev",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Test",
+      "type": "shell",
+      "windows": {
+        "command": "py -3 -m pipenv run pytest --verbose --log-level=DEBUG --log-cli-level=DEBUG"
+      },
+      "command": "python3 -m pipenv run pytest --verbose --log-level=DEBUG --log-cli-level=DEBUG",
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
+}

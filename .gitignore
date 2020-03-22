@@ -1,0 +1,7 @@
+/build
+/dist
+/meg_runtime.egg-info
+/.vscode/settings.json
+__pycache__
+.pytest_cache
+*.pyc

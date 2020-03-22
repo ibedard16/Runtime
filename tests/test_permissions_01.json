@@ -1,0 +1,20 @@
+{
+    "roles": {
+        "manager": ["user1"],
+        "engineer": ["user2", "user3"]
+    },
+    "files": {
+        "a": {
+            "users_read": ["user2"],
+            "users_write": [],
+            "roles_read": ["manager"],
+            "roles_write": ["manager"]
+        },
+        "b": {
+            "users_read": ["user2"],
+            "users_write": ["user2"],
+            "roles_read": [],
+            "roles_write": []
+        }
+    }
+}
