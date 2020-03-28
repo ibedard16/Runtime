@@ -50,7 +50,7 @@ class Config(dict):
 
     # Load a configuration from file
     @staticmethod
-    def load(path, clear=True):
+    def load(path='$(path/config)', clear=True):
         """Load a configuration from JSON file"""
         # Check there is a configuration instance
         if Config.__instance is None:
@@ -71,7 +71,9 @@ class Config(dict):
             # Overwrite or update the configuration
             Config.__instance.update(config)
             # Keep the correct path for configuration
-            Config.__instance['path']['config'] = path
+            if 'path' not in Config.__instance or not isinstance(Config.__instance['path'], dict):
+                Config.__instance._set_defaults()
+            Config.__instance._set_required(expanded_path)
         except Exception as e:
             # Log that loading the configuration failed
             Logger.warning(f'MEG Config: {e}')
@@ -81,7 +83,7 @@ class Config(dict):
 
     # Save a configuration to file
     @staticmethod
-    def save(path, overwrite=True):
+    def save(path='$(path/config)', overwrite=True):
         """Save a configuration to JSON file"""
         # Check there is a configuration instance
         if Config.__instance is None:
@@ -89,22 +91,28 @@ class Config(dict):
         if Config.__instance is None:
             return False
         try:
-            Logger.debug(f'MEG Config: Saving configuration <{Config.expand(path)}>')
+            # Get the expanded path
+            expanded_path = Config.expand(path)
+            Logger.debug(f'MEG Config: Saving configuration <{expanded_path}>')
             # Check the file exists before overwriting
-            if not overwrite and os.path.exists(path):
-                raise ConfigException(f'Not overwriting existing file <{path}>')
+            if not overwrite and os.path.exists(expanded_path):
+                raise ConfigException(f'Not overwriting existing file <{expanded_path}>')
             # Make the path to the containing directory if it does not exist
-            dir_path = os.path.dirname(path)
+            dir_path = os.path.dirname(expanded_path)
             if not os.path.exists(dir_path):
                 os.makedirs(dir_path, exist_ok=True)
             # Try to open the configuration file for writing
-            config_file = open(path, "w")
+            config_file = open(expanded_path, "w")
+            # Remove the blocked keys from being saved
+            config_copy = Config.__instance.copy()
+            for blocked_key in Config.__blocked_keys:
+                Config.__instance._remove(config_copy, [sk for sk in blocked_key.split('/') if sk])
             # Try to convert configuration to JSON file
-            json.dump(Config.__instance, config_file)
+            json.dump(config_copy, config_file, indent=2)
         except Exception as e:
             # Log that saving the configuration failed
             Logger.warning(f'MEG Config: {e}')
-            Logger.warning(f'MEG Config: Could not save configuration <{Config.expand(path)}>')
+            Logger.warning(f'MEG Config: Could not save configuration <{expanded_path}>')
             return False
         return True
 
@@ -138,9 +146,8 @@ class Config(dict):
             return defaultValue
         # Check the key is in the configuration dictionary by splitting into individual parts
         current_dict = Config.__instance
-        subkeys = key.split('/')
+        subkeys = [sk for sk in key.split('/') if sk]
         # Check to make sure the key was valid or return the default value
-        subkeys[:] = [sk for sk in subkeys if sk]
         if not len(subkeys) > 0:
             return defaultValue
         # Go through each key and traverse the configuration dictionary
@@ -179,9 +186,8 @@ class Config(dict):
             return False
         # Check the key is in the configuration dictionary by splitting into individual parts
         current_dict = Config.__instance
-        subkeys = key.split('/')
+        subkeys = [sk for sk in key.split('/') if sk]
         # Check to make sure the key was valid
-        subkeys[:] = [sk for sk in subkeys if sk]
         if not len(subkeys) > 0:
             return False
         # Go through each key and traverse the configuration dictionary
@@ -212,9 +218,8 @@ class Config(dict):
             return Config.remove(key)
         # Check the key is in the configuration dictionary by splitting into individual parts
         current_dict = Config.__instance
-        subkeys = key.split('/')
+        subkeys = [sk for sk in key.split('/') if sk]
         # Check to make sure the key was valid or return the default value
-        subkeys[:] = [sk for sk in subkeys if sk]
         if not len(subkeys) > 0:
             return False
         # Check key is blocked
@@ -245,26 +250,9 @@ class Config(dict):
             return False
         # Check the key is in the configuration dictionary by splitting into individual parts
         current_dict = Config.__instance
-        subkeys = key.split('/')
-        # Check to make sure the key was valid or return the default value
-        subkeys[:] = [sk for sk in subkeys if sk]
-        if not len(subkeys) > 0:
-            return True
-        # Go through each key and traverse the configuration dictionary
-        for sk in subkeys[:-1]:
-            # Check current key is in current dictionary
-            if sk not in current_dict:
-                return True
-            # Get the dictionary element by key
-            current_dict = current_dict[sk]
-            # Check the instance of the element is a dictionary or the key cannot be valid
-            if not isinstance(current_dict, dict):
-                return True
-        # Remove the dictionary element
-        sk = subkeys[-1]
-        if sk in current_dict:
-            current_dict.pop(sk)
-        return True
+        subkeys = [sk for sk in key.split('/') if sk]
+        # Traverse the configuration dictionary to remove the key and empty parent dictionaries
+        return Config.__instance._remove(Config.__instance, subkeys)
 
     # Clear the configuration
     @staticmethod
@@ -278,17 +266,51 @@ class Config(dict):
             if Config.__instance is not None:
                 # Clear the dictionary
                 super(Config, Config.__instance).clear()
-            # Create the path dictionary
-            Config.__instance['path'] = {}
-            # Get the user path from the environment, if present, otherwise use the default path
-            Config.__instance['path']['user'] = str(Path.home()) if 'MEG_USER_PATH' not in os.environ else os.environ['MEG_USER_PATH']
-            # Get the home path from the environment, if present, otherwise use the default path
-            Config.__instance['path']['home'] = '$(path/user)' + os.sep + '.meg' if 'MEG_HOME_PATH' not in os.environ else os.environ['MEG_HOME_PATH']
-            # Get the cache path from the environment, if present, otherwise use the default path
-            Config.__instance['path']['cache'] = '$(path/home)' + os.sep + 'cache' if 'MEG_CACHE_PATH' not in os.environ else os.environ['MEG_CACHE_PATH']
-            # Get the plugins path from the environment, if present, otherwise use the default path
-            Config.__instance['path']['plugins'] = '$(path/home)' + os.sep + 'plugins' if 'MEG_PLUGINS_PATH' not in os.environ else os.environ['MEG_PLUGINS_PATH']
-            # Get the plugin cache path from the environment, if present, otherwise use the default path
-            Config.__instance['path']['plugin_cache'] = '$(path/home)' + os.sep + 'plugin_cache' if 'MEG_PLUGIN_CACHE_PATH' not in os.environ else os.environ['MEG_PLUGIN_CACHE_PATH']
-            # Load configuration from the environment, if present, otherwise use the default path
-            Config.__instance['path']['config'] = '$(path/home)' + os.sep + 'config.json' if 'MEG_CONFIG_PATH' not in os.environ else os.environ['MEG_CONFIG_PATH']
+            # Set the default values
+            Config.__instance._set_defaults()
+
+    # Remove a key and all empty parent dictionaries that contain that key
+    def _remove(self, current_dict, subkeys):
+        # Check the subkeys are valid
+        if not isinstance(subkeys, list) or not len(subkeys) > 0:
+            return True
+        # Check the dictionary is valid
+        if not isinstance(current_dict, dict):
+            return True
+        # Get the current key
+        sk = subkeys[0]
+        # Check if this is the value to remove
+        if len(subkeys) == 1:
+            # Remove the key value
+            current_dict.pop(sk)
+        # Check if the subkey is in the current dictionary
+        elif sk in current_dict:
+            # Recurse the next subkey and dictionary
+            self._remove(current_dict[sk], subkeys[1:])
+            # Remove the dictionary if empty
+            if not current_dict[sk]:
+                current_dict.pop(sk)
+        # Removed the key
+        return True
+
+    # Set the default values
+    def _set_required(self, config_path):
+        # Get the user path from the environment, if present, otherwise use the default path
+        self['path']['user'] = str(Path.home()) if 'MEG_USER_PATH' not in os.environ else os.environ['MEG_USER_PATH']
+        # Load configuration from the environment, if present, otherwise use the default path
+        self['path']['config'] = config_path
+
+    # Set the default values
+    def _set_defaults(self):
+        # Create the path dictionary
+        self['path'] = {}
+        # Set the required values
+        self._set_required('$(path/home)' + os.sep + 'config.json' if 'MEG_CONFIG_PATH' not in os.environ else os.environ['MEG_CONFIG_PATH'])
+        # Get the home path from the environment, if present, otherwise use the default path
+        self['path']['home'] = '$(path/user)' + os.sep + '.meg' if 'MEG_HOME_PATH' not in os.environ else os.environ['MEG_HOME_PATH']
+        # Get the cache path from the environment, if present, otherwise use the default path
+        self['path']['cache'] = '$(path/home)' + os.sep + 'cache' if 'MEG_CACHE_PATH' not in os.environ else os.environ['MEG_CACHE_PATH']
+        # Get the plugins path from the environment, if present, otherwise use the default path
+        self['path']['plugins'] = '$(path/home)' + os.sep + 'plugins' if 'MEG_PLUGINS_PATH' not in os.environ else os.environ['MEG_PLUGINS_PATH']
+        # Get the plugin cache path from the environment, if present, otherwise use the default path
+        self['path']['plugin_cache'] = '$(path/home)' + os.sep + 'plugin_cache' if 'MEG_PLUGIN_CACHE_PATH' not in os.environ else os.environ['MEG_PLUGIN_CACHE_PATH']
