@@ -6,6 +6,7 @@ Configuration for runtime
 import os
 import re
 import json
+import errno
 import shutil
 from pathlib import Path
 from kivy.logger import Logger
@@ -74,6 +75,11 @@ class Config(dict):
             if 'path' not in Config.__instance or not isinstance(Config.__instance['path'], dict):
                 Config.__instance._set_defaults()
             Config.__instance._set_required(expanded_path)
+        except (OSError, IOError) as e:
+            # Do not say there was an error if the file exists
+            if e.errno == errno.ENOENT:
+                return True
+            raise e
         except Exception as e:
             # Log that loading the configuration failed
             Logger.warning(f'MEG Config: {e}')
