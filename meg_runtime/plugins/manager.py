@@ -37,11 +37,9 @@ class PluginManager(dict):
             super().__init__(**kwargs)
             # Set this as the current plugin manager instance
             PluginManager.__instance = self
-            # Set plugin and cache paths in python path for import, the first path may
-            #  be the Kivy library zip so check and insert one path later if that is the case
-            i = (3, 2)[os.path.isdir(sys.path[0])]
-            sys.path.insert(i, Config.get('path/cache'))
-            sys.path.insert(i, Config.get('path/plugins'))
+            # Set plugin and cache paths in python path for import
+            sys.path.append(Config.get('path/plugins'))
+            sys.path.append(Config.get('path/cache'))
             # Load information about plugins
             if update:
                 PluginManager.update()
