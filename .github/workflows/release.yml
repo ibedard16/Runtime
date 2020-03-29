@@ -27,7 +27,20 @@ jobs:
         MEG_RUNTIME_PKG_VERSION: ${{ github.event.release.tag_name }}
       run: |
         pipenv run setup.py sdist bdist_wheel
-    - name: Upload release ${{ github.event.release.tag_name }}
+    - name: Upload wheel for release ${{ github.event.release.tag_name }}
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: .\dist\meg_runtime-${{ github.event.release.tag_name }}-py3-none-any.whl
+        asset_name: meg_runtime-${{ github.event.release.tag_name }}-py3-none-any.whl
+        asset_content_type: application/zip
+    - name: Upload release ${{ github.event.release.tag_name }} to PyPi
       shell: cmd
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+        TWINE_NON_INTERACTIVE: 1
       run: |
-        echo TODO
+        pipenv run twince upload dist/*

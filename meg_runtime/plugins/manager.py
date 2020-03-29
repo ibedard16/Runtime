@@ -5,6 +5,7 @@ Plugin manager for runtime
 
 import os
 import sys
+import errno
 import shutil
 from kivy.logger import Logger
 from meg_runtime.config import Config
@@ -117,7 +118,7 @@ class PluginManager(dict):
         if PluginManager.__instance is None:
             return False
         # Log updating plugin information
-        Logger.debug(f'MEG Plugins: Updating plugin information')
+        Logger.debug(f'MEG Plugins: Updating plugin information {Config.get("path/plugins")}')
         # Unload all plugins
         PluginManager.unload_all()
         # Clear previous plugin information
@@ -143,7 +144,9 @@ class PluginManager(dict):
                     # Log that loading the plugin information failed
                     Logger.warning(f'MEG Plugins: {e}')
                     Logger.warning(f'MEG Plugins: Could not load information for plugin <{plugin_path}>')
-                    retval = False
+                    # Do not say there was an error if the file does not exists
+                    if e.errno != errno.ENOENT:
+                        retval = False
             # Do not actually walk the directory tree, only get directories directly under plugins path
             break
         return retval

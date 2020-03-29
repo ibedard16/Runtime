@@ -10,6 +10,16 @@ runtime_pkg_version = '0.0.0'
 if 'MEG_RUNTIME_PKG_VERSION' in os.environ:
     runtime_pkg_version = os.environ['MEG_RUNTIME_PKG_VERSION']
 
+required_packages = [
+    'kivy',
+    'kivy-deps.glew',
+    'kivy-deps.sdl2',
+    'pillow',
+    'pygit2',
+    'python-dateutil',
+    'requests'
+]
+
 setuptools.setup(
     name="meg_runtime",
     version=runtime_pkg_version,
@@ -18,7 +28,7 @@ setuptools.setup(
     description="Multimedia Extensible Git Runtime Library",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/MultimediaExtensibleGit",
+    url="https://github.com/MultimediaExtensibleGit/Runtime",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -26,4 +36,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.7',
+    install_requires=required_packages,
+    license='MIT',
 )
