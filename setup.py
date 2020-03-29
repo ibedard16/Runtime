@@ -6,9 +6,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-runtime_pkg_version = '0.0.0'
-if 'MEG_RUNTIME_PKG_VERSION' in os.environ:
-    runtime_pkg_version = os.environ['MEG_RUNTIME_PKG_VERSION']
+runtime_pkg_version = '0.0.0' if 'MEG_RUNTIME_PKG_VERSION' not in os.environ else os.environ['MEG_RUNTIME_PKG_VERSION']
 
 required_packages = [
     'kivy',
@@ -37,5 +35,5 @@ setuptools.setup(
     ],
     python_requires='>=3.7',
     install_requires=required_packages,
-    license='MIT',
+    license='MIT'
 )
