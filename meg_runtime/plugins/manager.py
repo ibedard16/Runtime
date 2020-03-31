@@ -273,12 +273,14 @@ class PluginManager(dict):
             # Get the plugin information for the path if no other version is installed
             plugin = PluginManager._update(path, force)
             if plugin is None:
-                # The same version exists and no force so this is installed
-                return True
-            # Log plugin information
-            PluginManager._log_plugin(plugin)
-            # Log trying to load plugin information from path
-            Logger.debug(f'MEG Plugins: Installing plugin <{plugin.name()}>')
+                if not force:
+                    # The same version exists and no force so this is installed
+                    return True
+            else:
+                # Log plugin information
+                PluginManager._log_plugin(plugin)
+                # Log trying to load plugin information from path
+                Logger.debug(f'MEG Plugins: Installing plugin <{plugin.name()}>')
             # Get the installed plugin path
             plugin_path = os.path.join(Config.get('path/plugins'), os.path.basename(path))
             # Remove the previous plugin path, if necessary
