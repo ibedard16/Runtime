@@ -5,9 +5,11 @@ Configuration for runtime
 
 import os
 import re
+import copy
 import json
 import errno
-import shutil
+import pathlib
+import requests
 from pathlib import Path
 from kivy.logger import Logger
 
@@ -110,9 +112,9 @@ class Config(dict):
             # Try to open the configuration file for writing
             config_file = open(expanded_path, "w")
             # Remove the blocked keys from being saved
-            config_copy = Config.__instance.copy()
+            config_copy = copy.deepcopy(Config.__instance)
             for blocked_key in Config.__blocked_keys:
-                Config.__instance._remove(config_copy, [sk for sk in blocked_key.split('/') if sk])
+                config_copy._remove(config_copy, [sk for sk in blocked_key.split('/') if sk])
             # Try to convert configuration to JSON file
             json.dump(config_copy, config_file, indent=2)
         except Exception as e:
@@ -255,7 +257,6 @@ class Config(dict):
         if not isinstance(key, str) or Config.__instance is None:
             return False
         # Check the key is in the configuration dictionary by splitting into individual parts
-        current_dict = Config.__instance
         subkeys = [sk for sk in key.split('/') if sk]
         # Traverse the configuration dictionary to remove the key and empty parent dictionaries
         return Config.__instance._remove(Config.__instance, subkeys)
@@ -272,11 +273,61 @@ class Config(dict):
             if Config.__instance is not None:
                 # Clear the dictionary
                 super(Config, Config.__instance).clear()
-            # Set the default values
-            Config.__instance._set_defaults()
+                # Set the default values
+                Config.__instance._set_defaults()
+
+    # Attempt to download to a local path from a remote url
+    @staticmethod
+    def download(url, path=None, unique_path=True, force=True):
+        """Attempt to download to a local path from a remote url"""
+        # Check the configuration dictionary is valid
+        if Config.__instance is None:
+            Config()
+        if not isinstance(url, str) or Config.__instance is None:
+            return None
+        # Get the download path
+        download_path = path if path else os.path.join(Config.get('path/downloads'), os.path.basename(url))
+        # Check if download path exists
+        if os.path.exists(download_path):
+            # Check if the download should happen based on the path existing and options
+            if not unique_path and not force:
+                return None
+            # Check if a unique path needs generated
+            if unique_path:
+                # Create a path from the download path
+                up = pathlib.Path(download_path)
+                # Insert a suffix that represents a unique counter
+                suffix = ''.join(up.suffixes)
+                original_path = download_path[:-len(suffix)]
+                # While the download path still exists make another unique one (only try 100 or fail)
+                for count in range(1, 100):
+                    download_path = original_path + '-' + str(count) + suffix
+                    if not os.path.exists(download_path):
+                        break
+                # If the path still exists there was no unique found, check force
+                if os.path.exists(download_path):
+                    if not force:
+                        return None
+                    # Reset the original path when forcing instead of unique
+                    download_path = original_path + suffix
+        # Log downloading
+        Logger.warning(f'MEG Config: Downloading url <{url}> to <{download_path}>')
+        try:
+            # Download remote request content
+            req = requests.get(url, allow_redirects=True)
+            # Save remote request to download path
+            open(download_path, "wb").write(req.content)
+        except Exception as e:
+            # Log that downloading failed
+            Logger.warning(f'MEG Config: {e}')
+            Logger.warning(f'MEG Config: Could not download url <{url}> to <{download_path}>')
+            return None
+        # Return the download path on success
+        return download_path
 
     # Remove a key and all empty parent dictionaries that contain that key
     def _remove(self, current_dict, subkeys):
+        """Remove a key and all empty parent dictionaries that contain that key"""
         # Check the subkeys are valid
         if not isinstance(subkeys, list) or not len(subkeys) > 0:
             return True
@@ -301,22 +352,35 @@ class Config(dict):
 
     # Set the default values
     def _set_required(self, config_path):
+        """Set the default values"""
         # Get the user path from the environment, if present, otherwise use the default path
         self['path']['user'] = str(Path.home()) if 'MEG_USER_PATH' not in os.environ else os.environ['MEG_USER_PATH']
         # Load configuration from the environment, if present, otherwise use the default path
         self['path']['config'] = config_path
+        # Get the default downloads path, if not already present
+        if 'downloads' not in self['path']:
+            # Get the default downloads path
+            downloads_path = os.path.join('$(path/user)', 'Downloads')
+            if os.name == 'nt':
+                # For windows, the registry must be queried for the correct default downloads path
+                import winreg
+                with winreg.OpenKey(winreg.HKEY_CURRENT_USER, 'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders') as key:
+                    downloads_path = winreg.QueryValueEx(key, '{374DE290-123F-4565-9164-39C4925E467B}')[0]
+            # Get the downloads directory from the environment, if present, otherwise use the default path
+            self['path']['downloads'] = downloads_path if 'MEG_DOWNLOADS_PATH' not in os.environ else os.environ['MEG_DOWNLOADS_PATH']
 
     # Set the default values
     def _set_defaults(self):
+        """Set the default values"""
         # Create the path dictionary
         self['path'] = {}
         # Set the required values
-        self._set_required('$(path/home)' + os.sep + 'config.json' if 'MEG_CONFIG_PATH' not in os.environ else os.environ['MEG_CONFIG_PATH'])
+        self._set_required(os.path.join('$(path/home)', 'config.json') if 'MEG_CONFIG_PATH' not in os.environ else os.environ['MEG_CONFIG_PATH'])
         # Get the home path from the environment, if present, otherwise use the default path
-        self['path']['home'] = '$(path/user)' + os.sep + '.meg' if 'MEG_HOME_PATH' not in os.environ else os.environ['MEG_HOME_PATH']
+        self['path']['home'] = os.path.join('$(path/user)', '.meg') if 'MEG_HOME_PATH' not in os.environ else os.environ['MEG_HOME_PATH']
         # Get the cache path from the environment, if present, otherwise use the default path
-        self['path']['cache'] = '$(path/home)' + os.sep + 'cache' if 'MEG_CACHE_PATH' not in os.environ else os.environ['MEG_CACHE_PATH']
+        self['path']['cache'] = os.path.join('$(path/home)', 'cache') if 'MEG_CACHE_PATH' not in os.environ else os.environ['MEG_CACHE_PATH']
         # Get the plugins path from the environment, if present, otherwise use the default path
-        self['path']['plugins'] = '$(path/home)' + os.sep + 'plugins' if 'MEG_PLUGINS_PATH' not in os.environ else os.environ['MEG_PLUGINS_PATH']
+        self['path']['plugins'] = os.path.join('$(path/home)', 'plugins') if 'MEG_PLUGINS_PATH' not in os.environ else os.environ['MEG_PLUGINS_PATH']
         # Get the plugin cache path from the environment, if present, otherwise use the default path
-        self['path']['plugin_cache'] = '$(path/home)' + os.sep + 'plugin_cache' if 'MEG_PLUGIN_CACHE_PATH' not in os.environ else os.environ['MEG_PLUGIN_CACHE_PATH']
+        self['path']['plugin_cache'] = os.path.join('$(path/home)', 'plugin_cache') if 'MEG_PLUGIN_CACHE_PATH' not in os.environ else os.environ['MEG_PLUGIN_CACHE_PATH']

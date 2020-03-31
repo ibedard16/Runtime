@@ -1,7 +1,6 @@
 """Runtime library unit testing for permissions"""
 
 import os
-import sys
 import pytest
 from meg_runtime import PermissionsManager
 

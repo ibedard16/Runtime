@@ -49,7 +49,7 @@ class PluginInformation(dict):
         # Initialize super class constructor
         super().__init__(**kwargs)
         # Get the plugin information file path
-        plugin_info_path = plugin_path + os.sep + PluginInformation.DEFAULT_PLUGIN_INFO_PATH
+        plugin_info_path = os.path.join(plugin_path, PluginInformation.DEFAULT_PLUGIN_INFO_PATH)
         # Try to load plugin information
         plugin_info_file = open(plugin_info_path, 'r')
         # Log debug information about the plugin
@@ -101,7 +101,7 @@ class PluginInformation(dict):
     def script(self):
         """Get plugin script path"""
         if 'script' not in self or not isinstance(self['script'], str):
-            return self.path() + os.sep + PluginInformation.DEFAULT_PLUGIN_SCRIPT_PATH
+            return os.path.join(self.path(), PluginInformation.DEFAULT_PLUGIN_SCRIPT_PATH)
         return self['script']
 
     # Get plugin name

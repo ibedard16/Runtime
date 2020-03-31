@@ -85,12 +85,12 @@ class GitManager(dict):
                     #  1. The configured repositories directory path
                     #  2. The configured user directory path
                     #  3. The current working directory path
-                    repo_prefix = Config.get('path/repos', Config.get('path/user', os.curdir)) + os.sep
+                    repo_prefix = Config.get('path/repos', Config.get('path/user', os.curdir))
                     # Append the name of the repository to the path
                     if isinstance(repo_url, str):
-                        repo_path = repo_prefix + pathlib.Path(repo_url).stem
+                        repo_path = os.path.join(repo_prefix, pathlib.Path(repo_url).stem)
                     elif isinstance(repo_url, pathlib.Path):
-                        repo_path = repo_prefix + repo_url.stem
+                        repo_path = os.path.join(repo_prefix, repo_url.stem)
                     else:
                         raise GitException(f'No local repository path was provided and the path could not be determined from the remote <{repo_url}>')
                 # Clone the repository by creating a repository instance

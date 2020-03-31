@@ -1,7 +1,5 @@
 """Runtime library unit testing for configuration"""
 
-import os
-import sys
 from meg_runtime import Config
 
 

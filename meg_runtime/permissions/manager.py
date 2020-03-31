@@ -1,12 +1,7 @@
 """Multimedia Extensible Git (MEG) permissions manager"""
 
-import os
-import sys
 import json
-import pathlib
 from kivy.logger import Logger
-from meg_runtime.config import Config
-from meg_runtime.plugins.plugin import Plugin
 
 
 class PermissionsManager(dict):
@@ -52,5 +47,3 @@ class PermissionsManager(dict):
         """Get a list of users from the configuration file."""
         return [role for role in self['roles']
                 if self._user in self['roles'][role]]
-
-
