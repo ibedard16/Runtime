@@ -113,7 +113,7 @@ class PluginManager(dict):
                     Logger.warning(f'MEG Plugins: {e}')
                     Logger.warning(f'MEG Plugins: Could not load information for plugin <{plugin_path}>')
                     # Do not say there was an error if the file does not exists
-                    if e.errno != errno.ENOENT:
+                    if isinstance(e, OSError) and e.errno != errno.ENOENT:
                         retval = False
             # Do not actually walk the directory tree, only get directories directly under plugins path
             break
