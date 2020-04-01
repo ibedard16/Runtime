@@ -8,6 +8,7 @@ import re
 import copy
 import json
 import errno
+import shutil
 import pathlib
 import requests
 from pathlib import Path
@@ -276,6 +277,52 @@ class Config(dict):
                 # Set the default values
                 Config.__instance._set_defaults()
 
+    # Remove a path (directory or file)
+    @staticmethod
+    def remove_path(path):
+        """Remove a path (directory or file)"""
+        try:
+            # Check if path exists
+            if os.path.exists(path):
+                # Log removing path
+                Logger.warning(f'MEG Config: Removing path <{path}>')
+                # Check if path is directory or file
+                if os.path.isdir(path):
+                    # Remove directory
+                    shutil.rmtree(path)
+                else:
+                    # Remove file
+                    os.remove(path)
+        except Exception as e:
+            # Log that removing path failed
+            Logger.warning(f'MEG Config: {e}')
+            Logger.warning(f'MEG Config: Could not remove path <{path}>')
+            return False
+        return True
+
+    # Ensure a unique path from a path
+    @staticmethod
+    def unique_path(path, unique_path=True, force=True):
+        """Ensure a unique path from a path"""
+        # Check if path exists
+        if not os.path.exists(path):
+            return path
+        # Check if the path is valid based on the path existing and options
+        if not unique_path and not force:
+            return None
+        # Check if a unique path needs generated
+        if unique_path:
+            # Insert a suffix that represents a unique counter
+            suffix = ''.join(pathlib.Path(path).suffixes)
+            original_path = path[:-len(suffix)]
+            # While the path still exists make another unique one (only try 100 or fail)
+            for count in range(1, 100):
+                download_path = original_path + '-' + str(count) + suffix
+                if not os.path.exists(download_path):
+                    return download_path
+        # Return the original path if forcing
+        return path if force else None
+
     # Attempt to download to a local path from a remote url
     @staticmethod
     def download(url, path=None, unique_path=True, force=True):
@@ -285,43 +332,21 @@ class Config(dict):
             Config()
         if not isinstance(url, str) or Config.__instance is None:
             return None
-        # Get the download path
-        download_path = path if path else os.path.join(Config.get('path/downloads'), os.path.basename(url))
-        # Check if download path exists
-        if os.path.exists(download_path):
-            # Check if the download should happen based on the path existing and options
-            if not unique_path and not force:
+        # Get the download path from the given path or url
+        download_path = Config.unique_path(path if path else os.path.join(Config.get('path/downloads'), os.path.basename(url)), unique_path, force)
+        if download_path:
+            # Log downloading
+            Logger.warning(f'MEG Config: Downloading url <{url}> to <{download_path}>')
+            try:
+                # Download remote request content
+                req = requests.get(url, allow_redirects=True)
+                # Save remote request to download path
+                open(download_path, "wb").write(req.content)
+            except Exception as e:
+                # Log that downloading failed
+                Logger.warning(f'MEG Config: {e}')
+                Logger.warning(f'MEG Config: Could not download url <{url}> to <{download_path}>')
                 return None
-            # Check if a unique path needs generated
-            if unique_path:
-                # Create a path from the download path
-                up = pathlib.Path(download_path)
-                # Insert a suffix that represents a unique counter
-                suffix = ''.join(up.suffixes)
-                original_path = download_path[:-len(suffix)]
-                # While the download path still exists make another unique one (only try 100 or fail)
-                for count in range(1, 100):
-                    download_path = original_path + '-' + str(count) + suffix
-                    if not os.path.exists(download_path):
-                        break
-                # If the path still exists there was no unique found, check force
-                if os.path.exists(download_path):
-                    if not force:
-                        return None
-                    # Reset the original path when forcing instead of unique
-                    download_path = original_path + suffix
-        # Log downloading
-        Logger.warning(f'MEG Config: Downloading url <{url}> to <{download_path}>')
-        try:
-            # Download remote request content
-            req = requests.get(url, allow_redirects=True)
-            # Save remote request to download path
-            open(download_path, "wb").write(req.content)
-        except Exception as e:
-            # Log that downloading failed
-            Logger.warning(f'MEG Config: {e}')
-            Logger.warning(f'MEG Config: Could not download url <{url}> to <{download_path}>')
-            return None
         # Return the download path on success
         return download_path
 

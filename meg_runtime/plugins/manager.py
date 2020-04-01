@@ -60,54 +60,21 @@ class PluginManager(dict):
     def clean_cache():
         """Clean dependency cache"""
         # Remove the cache directory or the block file
-        cache_path = Config.get('path/cache')
-        if isinstance(cache_path, str) and os.path.exists(cache_path):
-            try:
-                if os.path.isdir(cache_path):
-                    # Remove cache directory
-                    shutil.rmtree(cache_path)
-                else:
-                    # Remove cache directory block file
-                    os.remove(cache_path)
-            except Exception:
-                return False
-        return True
+        return Config.remove_path(Config.get('path/cache'))
 
     # Clean plugins
     @staticmethod
     def clean_plugins():
         """Clean plugins"""
         # Remove the plugins directory or the block file
-        plugins_path = Config.get('path/plugins')
-        if isinstance(plugins_path, str) and os.path.exists(plugins_path):
-            try:
-                if os.path.isdir(plugins_path):
-                    # Remove plugins directory
-                    shutil.rmtree(plugins_path)
-                else:
-                    # Remove plugins directory block file
-                    os.remove(plugins_path)
-            except Exception:
-                return False
-        return True
+        return Config.remove_path(Config.get('path/plugins'))
 
     # Clean plugin cache
     @staticmethod
     def clean_plugin_cache():
         """Clean plugin cache"""
         # Remove the plugin cache directory or the block file
-        plugin_cache_path = Config.get('path/plugin_cache')
-        if isinstance(plugin_cache_path, str) and os.path.exists(plugin_cache_path):
-            try:
-                if os.path.isdir(plugin_cache_path):
-                    # Remove plugin cache directory
-                    shutil.rmtree(plugin_cache_path)
-                else:
-                    # Remove plugin cache directory block file
-                    os.remove(plugin_cache_path)
-            except Exception:
-                return False
-        return True
+        return Config.remove_path(Config.get('path/plugin_cache'))
 
     # Update local plugin information
     @staticmethod
@@ -223,13 +190,8 @@ class PluginManager(dict):
         plugin_path = os.path.join(plugins_path, plugin_basename)
         try:
             # Remove the previous plugin path, if necessary
-            if os.path.exists(plugin_path):
-                if os.path.isdir(plugin_path):
-                    # Remove plugin directory
-                    shutil.rmtree(plugin_path)
-                else:
-                    # Remove plugin directory block file
-                    os.remove(plugin_path)
+            if not Config.remove_path(plugin_path):
+                return False
             # Open the local plugin cache repository
             cache_path = os.path.join(Config.get('path/plugin_cache'), 'remote', PluginManager.DEFAULT_BARE_REPO_PATH)
             cache = GitManager.open(cache_path, bare=True)
@@ -262,52 +224,44 @@ class PluginManager(dict):
         # Check there is plugin manager instance
         if PluginManager.__instance is None:
             PluginManager()
-        if PluginManager.__instance is None:
-            return False
-        # Check if path does not exist
-        if not os.path.exists(path) or not os.path.isdir(path):
-            return False
-        # Log trying to load plugin information from path
-        Logger.debug(f'MEG Plugins: Installing plugin from path <{path}>')
-        try:
-            # Get the plugin information for the path if no other version is installed
-            plugin = PluginManager._update(path, force)
-            if plugin is None:
-                if not force:
-                    # The same version exists and no force so this is installed
-                    return True
-            else:
-                # Log plugin information
-                PluginManager._log_plugin(plugin)
+        if PluginManager.__instance is not None:
+            # Check if path does not exist
+            if os.path.exists(path) and os.path.isdir(path):
                 # Log trying to load plugin information from path
-                Logger.debug(f'MEG Plugins: Installing plugin <{plugin.name()}>')
-            # Get the installed plugin path
-            plugin_path = os.path.join(Config.get('path/plugins'), os.path.basename(path))
-            # Remove the previous plugin path, if necessary
-            if os.path.exists(plugin_path):
-                if os.path.isdir(plugin_path):
-                    # Remove plugin directory
-                    shutil.rmtree(plugin_path)
-                else:
-                    # Remove plugin directory block file
-                    os.remove(plugin_path)
-            # Copy the path to the plugins directory
-            shutil.copytree(path, plugin_path)
-            # Load (or update) plugin information
-            plugin = Plugin(plugin_path)
-            if plugin is not None:
-                # Log plugin information
-                PluginManager._log_plugin(plugin)
-                # Setup plugin dependencies
-                plugin.setup().check_returncode()
-                # Add the plugin
-                PluginManager.__instance['plugins'][plugin.name()] = plugin
-        except Exception as e:
-            # Log that installing the plugin from the path failed
-            Logger.warning(f'MEG Plugins: {e}')
-            Logger.warning(f'MEG Plugins: Failed to install plugin from path <{path}>')
-            return False
-        return True
+                Logger.debug(f'MEG Plugins: Installing plugin from path <{path}>')
+                try:
+                    # Get the plugin information for the path if no other version is installed
+                    plugin = PluginManager._update(path, force)
+                    if plugin is not None:
+                        # Log plugin information
+                        PluginManager._log_plugin(plugin)
+                        # Log trying to load plugin information from path
+                        Logger.debug(f'MEG Plugins: Installing plugin <{plugin.name()}>')
+                    elif not force:
+                        # The same version exists and no force so this is installed
+                        return True
+                    # Get the installed plugin path
+                    plugin_path = os.path.join(Config.get('path/plugins'), os.path.basename(path))
+                    # Remove the previous plugin path, if necessary
+                    if not Config.remove_path(plugin_path):
+                        return False
+                    # Copy the path to the plugins directory
+                    shutil.copytree(path, plugin_path)
+                    # Load (or update) plugin information
+                    plugin = Plugin(plugin_path)
+                    if plugin is not None:
+                        # Log plugin information
+                        PluginManager._log_plugin(plugin)
+                        # Setup plugin dependencies
+                        plugin.setup().check_returncode()
+                        # Add the plugin
+                        PluginManager.__instance['plugins'][plugin.name()] = plugin
+                    return True
+                except Exception as e:
+                    # Log that installing the plugin from the path failed
+                    Logger.warning(f'MEG Plugins: {e}')
+                    Logger.warning(f'MEG Plugins: Failed to install plugin from path <{path}>')
+        return False
 
     # Install plugin archive
     @staticmethod
@@ -374,7 +328,7 @@ class PluginManager(dict):
                 # Remove the plugin instance
                 PluginManager.__instance['plugins'].pop(name)
                 # Remove the plugin directory
-                shutil.rmtree(plugin.path())
+                return Config.remove_path(plugin.path())
             except Exception as e:
                 # Log uninstalling plugin failed
                 Logger.warning(f'MEG Plugins: {e}')
@@ -772,21 +726,17 @@ class PluginManager(dict):
         for plugin_name, plugin_list in archive_list:
             # Get the plugin path
             plugin_path = os.path.join(plugins_path, plugin_name)
-            # Log caching plugin
-            Logger.debug(f'MEG Plugins: Locally caching plugin <{plugin_path}>')
             try:
                 # Remove the previous plugin path, if necessary
-                if os.path.exists(plugin_path):
-                    if os.path.isdir(plugin_path):
-                        # Remove plugin directory
-                        shutil.rmtree(plugin_path)
-                    else:
-                        # Remove plugin directory block file
-                        os.remove(plugin_path)
-                # Extract each plugin from archive to install
-                archive.extractall(plugin_path, plugin_list)
-                # Install cached plugin
-                retval = PluginManager.install_path(plugin_path, force) and retval
+                if Config.remove_path(plugin_path):
+                    # Log caching plugin
+                    Logger.debug(f'MEG Plugins: Locally caching plugin <{plugin_path}>')
+                    # Extract each plugin from archive to install
+                    archive.extractall(plugin_path, plugin_list)
+                    # Install cached plugin
+                    retval = PluginManager.install_path(plugin_path, force) and retval
+                else:
+                    retval = False
             except Exception as e:
                 # Log that caching plugin locally failed
                 Logger.warning(f'MEG Plugins: {e}')
