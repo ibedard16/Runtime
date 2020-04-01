@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "15110868e6331089dbf2865a5709c294171832bb42650df303182b61ad056c80"
+            "sha256": "0352e339044a4f0b3461fb496fcc7fccad6bb3338a55c7493b469480e874b1d8"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -84,25 +84,24 @@
         },
         "kivy": {
             "hashes": [
-                "sha256:090d3ded9835a17477cd93fbdaf0a7c42ff2218981cf198ded5ad8795bc74391",
-                "sha256:11e85eaf6efbfa2362a3334ffdad179a1b0ca8d255cca79eaa6a2765560d4982",
-                "sha256:1a1ff32f8a95f1e175198cbab81fcd2596783b180d4eafe63e87d171aa7fdb5e",
-                "sha256:1d28b198a64c30db8d94a0488e85f3037af60d514ab0d7ad5ab45add3ab77090",
-                "sha256:4a5480cbf837d3780c77a4f61b32b56d22ae9f03845e7a89dd3eaef1ae5fd037",
-                "sha256:4d0e596f74271e901b551f77661dde238df4765484fce9f5d1c72e8022984e84",
-                "sha256:5c3d0f2749522d62e9cce09cd54b2d823bf1b6b644ff1f627be49de6f3e3cba0",
-                "sha256:815a5c0b3b72fcd81ca7b2aa0744087163ed03e4cf9ab4e7c9733cea99fc1571",
-                "sha256:8819a27a09871af451760cb69486ced52e830c8a0a37480f22ef5e692f12c05b",
-                "sha256:a687602d90c4629dd036f577ca39acb76ba581370f9d915f3cab99be818ba8ad",
-                "sha256:b7ef6aad43a86d8df3fb865db864e354f2155a748019f8517f69f65c1a29cb64",
-                "sha256:b85ccf165050cbf2ee8447671eebbc222b369b40f0e0038dd9547d49a5e37373",
-                "sha256:c36652caa7f6c327dee834cfc699d5962d346b7a53e54bd81abc17c314226d89",
-                "sha256:ece170514db3f49844a41e4c910ad9ce9bc46da6f47a49158e11266bdcc6e479",
-                "sha256:f3bea6e4a21991827885d04127fc6d09a0e974ecfa12da7bf5faae93562ea102",
-                "sha256:f835462dd9aa491272552ef079b948a088598e2e95d68bb1d885d2c3f3d4e2c3"
+                "sha256:135f120ba7ef7d1af925c664e11e7e4b920ac2e4d335429e9ca5a46979d8811b",
+                "sha256:3cae19e8d8a4f905a8d5118ca7f3089edbe4e2dc312bbfc6d39d483f7ff03684",
+                "sha256:4629aaaf85e427a319953fe7d827369de3e7a1da778233f43e53d1a47c21305c",
+                "sha256:4c39c88ad93144213db596afe426dd15a5a404fee06542d717849ff33b1d54a0",
+                "sha256:4dd2f9665c339faaa66b22711696cad9610a0fe88f32f3aa7eeacc3634695475",
+                "sha256:5259e472b0fb2f11d1a4d3a3a69dc7b8f82e32a1d0da2d2cf0bed3ce37e7953a",
+                "sha256:530db8ca4700564d69a49136652866e9acc0feac55948e834675e3b18071ea2d",
+                "sha256:61ae796bf73e83e13af6888d985033eea40137873cb64eb84f8807e41525ad66",
+                "sha256:68753d3cd97cad53b64f722d928212f079a1bdcc61559e0d3bd924cd8411dd2a",
+                "sha256:798254a0efa865071ea8349bfb1ce3b5bc85d2a6b4b091d81113fb1be0479816",
+                "sha256:88454bb7fa554b376f519ec7fb58520ac7eab908b6b69e9bb2a28f0d0491fc58",
+                "sha256:8a1038666315fcfeb55d91ca7f1db68b2a24fe6942fd7a12e83f1de6ebd4de3a",
+                "sha256:ad71864441b581587d9106e4f0fb19b69ef0f89308d4f0ed43a734fb85376476",
+                "sha256:b1daec16298397433d361f39953246e74e2edeb450d88a7aef952e773eb3f22c",
+                "sha256:bda4e4c1b340267d1335ab8892283a78bf0de1e534c6ac6e523f52233c892432"
             ],
             "index": "pypi",
-            "version": "==1.11.1"
+            "version": "==2.0.0rc1"
         },
         "kivy-deps.glew": {
             "hashes": [
@@ -201,7 +200,6 @@
                 "sha256:71be40c1fbd28594214ecaecb58e7aa8b708eabfa0125c8a109ebd51edbd776a"
             ],
             "index": "pypi",
-            "markers": "os_name == 'nt'",
             "version": "==223"
         },
         "python-dateutil": {
@@ -458,10 +456,10 @@
         },
         "tqdm": {
             "hashes": [
-                "sha256:4f882b23c492e7060f50d83af86f163b67e4cfbe35dfe12077e748c56282f438",
-                "sha256:f0fc945df434e5e612fb7eb93bf29e924940913590450c3760f198dd75a2cd19"
+                "sha256:03d2366c64d44c7f61e74c700d9b202d57e9efe355ea5c28814c52bfe7a50b8c",
+                "sha256:be5ddeec77d78ba781ea41eacb2358a77f74cc2407f54b82222d7ee7dc8c8ccf"
             ],
-            "version": "==4.44.0"
+            "version": "==4.44.1"
         },
         "twine": {
             "hashes": [

@@ -16,6 +16,9 @@ kivy = "*"
 "kivy-deps.sdl2" = "*"
 pillow = "*"
 pygit2 = "*"
-pypiwin32 = { version = "*", os_name = "== 'nt'" }
+pypiwin32 = "*"
 python-dateutil = "*"
 requests = "*"
+
+[pipenv]
+allow_prereleases = true

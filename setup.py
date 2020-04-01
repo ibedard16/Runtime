@@ -3,19 +3,21 @@
 import os
 import setuptools
 
+# TODO: Replace README.md with Runtime.md for package information
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 runtime_pkg_version = '0.0.0' if 'MEG_RUNTIME_PKG_VERSION' not in os.environ else os.environ['MEG_RUNTIME_PKG_VERSION']
 
 required_packages = [
-    'kivy',
+    'kivy>=2.0rc',
     'kivy-deps.glew',
     'kivy-deps.sdl2',
     'pillow',
     'pygit2',
     'python-dateutil',
-    'requests'
+    'requests',
+    'pypiwin32'
 ]
 
 setuptools.setup(
@@ -35,5 +37,6 @@ setuptools.setup(
     ],
     python_requires='>=3.7',
     install_requires=required_packages,
+    platforms=['any'],
     license='MIT'
 )
