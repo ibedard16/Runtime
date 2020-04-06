@@ -10,14 +10,12 @@ with open("README.md", "r") as fh:
 runtime_pkg_version = '0.0.0' if 'MEG_RUNTIME_PKG_VERSION' not in os.environ else os.environ['MEG_RUNTIME_PKG_VERSION']
 
 required_packages = [
-    'kivy>=2.0rc',
-    'kivy-deps.glew',
-    'kivy-deps.sdl2',
+    'PyQt5',
     'pillow',
     'pygit2',
     'python-dateutil',
     'requests',
-    'pypiwin32'
+    'pywin32',
 ]
 
 setuptools.setup(
@@ -38,5 +36,6 @@ setuptools.setup(
     python_requires='>=3.7',
     install_requires=required_packages,
     platforms=['any'],
-    license='MIT'
+    license='MIT',
+    include_package_data=True
 )

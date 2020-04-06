@@ -12,7 +12,7 @@ import shutil
 import pathlib
 import requests
 from pathlib import Path
-from kivy.logger import Logger
+from meg_runtime.logger import Logger
 
 
 # Runtime configuration exception

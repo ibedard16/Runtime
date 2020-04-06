@@ -10,10 +10,10 @@ import errno
 import shutil
 import tarfile
 import zipfile
-from kivy.logger import Logger
 from meg_runtime.config import Config
 from meg_runtime.plugins import Plugin, PluginInformation, PluginException
 from meg_runtime.git import GitException, GitManager
+from meg_runtime.logger import Logger
 
 
 # Runtime plugin manager

@@ -11,12 +11,9 @@ twine = "*"
 wheel = "*"
 
 [packages]
-kivy = "*"
-"kivy-deps.glew" = "*"
-"kivy-deps.sdl2" = "*"
-pillow = "*"
+PyQt5 = "*"
 pygit2 = "*"
-pypiwin32 = "*"
+pywin32 = {version = "*", os_name = "=='nt'"}
 python-dateutil = "*"
 requests = "*"
 

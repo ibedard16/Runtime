@@ -9,8 +9,8 @@ import json
 import inspect
 import importlib
 import subprocess
-from kivy.logger import Logger
 from meg_runtime.config import Config
+from meg_runtime.logger import Logger
 
 
 # Runtime plugin exception

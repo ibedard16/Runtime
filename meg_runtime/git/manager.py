@@ -5,9 +5,9 @@ Git repository manager for runtime
 
 import os
 import pathlib
-from kivy.logger import Logger
 from meg_runtime.config import Config
 from meg_runtime.git.repository import GitRepository, GitException
+from meg_runtime.logger import Logger
 
 
 # Git repository manager

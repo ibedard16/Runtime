@@ -1,7 +1,7 @@
 """Multimedia Extensible Git (MEG) permissions manager"""
 
 import json
-from kivy.logger import Logger
+from meg_runtime.logger import Logger
 
 
 class PermissionsManager(dict):
