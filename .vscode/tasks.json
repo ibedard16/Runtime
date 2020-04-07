@@ -5,9 +5,9 @@
       "label": "Build",
       "type": "shell",
       "windows": {
-        "command": "py -3 -m pipenv run setup.py sdist bdist_wheel"
+        "command": "py -3 -m pipenv run python setup.py sdist bdist_wheel"
       },
-      "command": "python3 -m pipenv run setup.py sdist bdist_wheel",
+      "command": "python3 -m pipenv run python setup.py sdist bdist_wheel",
       "group": "build",
       "problemMatcher": []
     },
