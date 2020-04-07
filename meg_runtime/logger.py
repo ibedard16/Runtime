@@ -10,6 +10,11 @@ class Logger(object):
         logger.debug(message)
 
     @staticmethod
+    def info(message):
+        logger = logging.getLogger(__name__)
+        logger.info(message)
+
+    @staticmethod
     def warning(message):
         logger = logging.getLogger(__name__)
-        logger.debug(message)
+        logger.warning(message)

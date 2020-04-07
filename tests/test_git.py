@@ -7,8 +7,7 @@ import tempfile
 import pytest
 from dateutil.tz import gettz
 from datetime import datetime
-from kivy.logger import Logger
-from meg_runtime import GitRepository, GitManager
+from meg_runtime import GitRepository, GitManager, Logger
 
 
 # PyTest session fixture to get temporary path for git repo tests

@@ -16,6 +16,3 @@ pygit2 = "*"
 pywin32 = {version = "*", os_name = "=='nt'"}
 python-dateutil = "*"
 requests = "*"
-
-[pipenv]
-allow_prereleases = true

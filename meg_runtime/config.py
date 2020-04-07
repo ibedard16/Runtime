@@ -78,12 +78,10 @@ class Config(dict):
             if 'path' not in Config.__instance or not isinstance(Config.__instance['path'], dict):
                 Config.__instance._set_defaults()
             Config.__instance._set_required(expanded_path)
-        except (OSError, IOError) as e:
-            # Do not say there was an error if the file exists
-            if e.errno == errno.ENOENT:
-                return True
-            raise e
         except Exception as e:
+            # Do not say there was an error if the file exists
+            if isinstance(e, OSError) and e.errno == errno.ENOENT:
+                return True
             # Log that loading the configuration failed
             Logger.warning(f'MEG Config: {e}')
             Logger.warning(f'MEG Config: Could not load configuration <{expanded_path}>')
@@ -387,10 +385,13 @@ class Config(dict):
             # Get the default downloads path
             downloads_path = os.path.join('$(path/user)', 'Downloads')
             if os.name == 'nt':
-                # For windows, the registry must be queried for the correct default downloads path
-                import winreg
-                with winreg.OpenKey(winreg.HKEY_CURRENT_USER, 'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders') as key:
-                    downloads_path = winreg.QueryValueEx(key, '{374DE290-123F-4565-9164-39C4925E467B}')[0]
+                try:
+                    import winreg
+                    # For windows, the registry must be queried for the correct default downloads path
+                    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, 'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders') as key:
+                        downloads_path = winreg.QueryValueEx(key, '{374DE290-123F-4565-9164-39C4925E467B}')[0]
+                except Exception as e:
+                    Logger.warning(f'MEG Config: {e}')
             # Get the downloads directory from the environment, if present, otherwise use the default path
             self['path']['downloads'] = downloads_path if 'MEG_DOWNLOADS_PATH' not in os.environ else os.environ['MEG_DOWNLOADS_PATH']
 
