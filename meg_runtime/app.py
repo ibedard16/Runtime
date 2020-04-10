@@ -9,7 +9,7 @@ from meg_runtime.ui import UIManager
 from meg_runtime.logger import Logger
 
 # MEG client application
-class MEGApp(QtWidgets.QApplication):
+class App(QtWidgets.QApplication):
     """Multimedia Extensible Git (MEG) Client Application"""
 
     # Constructor
