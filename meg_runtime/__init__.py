@@ -7,3 +7,4 @@ from meg_runtime.permissions import PermissionsManager
 from meg_runtime.locking import LockingManager
 from meg_runtime.plugins import Plugin, PluginInformation, PluginException, PluginManager
 from meg_runtime.ui import UIManager, ui_run
+from meg_runtime.app import MEGApp
