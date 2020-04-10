@@ -49,12 +49,3 @@ class UIManager(QtWidgets.QStackedWidget):
     # TODO: Add more menu opening/closing methods here
 
 
-def ui_run(**kwargs):
-    """Start the UI loop."""
-    app = QtWidgets.QApplication([])
-    manager = UIManager(**kwargs)
-    manager.show()
-    return app.exec_()
-
-
-
