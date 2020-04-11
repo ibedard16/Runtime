@@ -8,6 +8,7 @@ from meg_runtime.plugins import PluginManager
 from meg_runtime.ui import UIManager
 from meg_runtime.logger import Logger
 
+
 # MEG client application
 class App(QtWidgets.QApplication):
     """Multimedia Extensible Git (MEG) Client Application"""
@@ -17,7 +18,12 @@ class App(QtWidgets.QApplication):
         """Application constructor"""
         # Initialize super class constructor
         super().__init__([])
-        # Log debug information about home directory
+       
+
+    # On application start
+    def on_start(self):
+        """On application start"""
+         # Log debug information about home directory
         Logger.debug('MEG: Home <' + Config.get('path/home') + '>')
         # Load configuration
         Config.load()
@@ -37,6 +43,8 @@ class App(QtWidgets.QApplication):
     # Run the application
     def run(self, **kwargs):
         """Run the application UI"""
+        self.on_start()
+
         manager = UIManager(**kwargs)
         manager.show()
 
