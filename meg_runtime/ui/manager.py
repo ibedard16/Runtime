@@ -1,15 +1,10 @@
 """MEG UI Manager
 """
-from PyQt5 import QtWidgets, uic
-
-from os.path import dirname
-import pkg_resources
-import sys
+from PyQt5 import QtWidgets
 
 from meg_runtime.ui.mainmenupanel import MainMenuPanel
 from meg_runtime.ui.clonepanel import ClonePanel
 from meg_runtime.ui.repopanel import RepoPanel
-from meg_runtime.logger import Logger
 
 
 class UIManager(QtWidgets.QStackedWidget):
@@ -47,14 +42,3 @@ class UIManager(QtWidgets.QStackedWidget):
         self.setCurrentIndex(self.PANELS.index(panel))
 
     # TODO: Add more menu opening/closing methods here
-
-
-def ui_run(**kwargs):
-    """Start the UI loop."""
-    app = QtWidgets.QApplication([])
-    manager = UIManager(**kwargs)
-    manager.show()
-    return app.exec_()
-
-
-

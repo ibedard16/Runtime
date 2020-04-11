@@ -22,6 +22,5 @@ class BasePanel(QtWidgets.QMainWindow):
             uic.loadUi(path, self)
         except Exception as e:
             Logger.warning('MEG: BasePanel: {}'.format(e))
-            Logger.warning('MEG: BasePanel: Could not load path {}'.format(path))
-
-
+            Logger.warning('MEG: BasePanel: Could not load path {}'
+                           .format(path))
