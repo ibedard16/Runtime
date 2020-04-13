@@ -34,7 +34,8 @@ class UIManager(QtWidgets.QMainWindow):
                 Logger.warning(f'MEG: BasePanel: Could not load path {path}')
             # Set the open repository
             self._open_repo = None
-            self.change_view(App.get_panel('MainPanel'))
+            #self.change_view(App.get_panel('MainPanel'))
+            self.change_view(App.get_panel('PluginsPanel'))
             # Set the icon
             icon_path = App.get_icon()
             if icon_path is not None:
@@ -58,6 +59,11 @@ class UIManager(QtWidgets.QMainWindow):
         """"Download" or clone a project."""
         # TODO
         UIManager.change_view(App.get_panel('ClonePanel'))
+
+    @staticmethod
+    def open_plugins_panel():
+        """Manage installed plugins"""
+        UIManager.change_view(App.get_panel('PluginsPanel'))
 
     @staticmethod
     def return_to_main():
