@@ -1,44 +1,99 @@
 """MEG UI Manager
 """
-from PyQt5 import QtWidgets
 
-from meg_runtime.ui.mainmenupanel import MainMenuPanel
-from meg_runtime.ui.clonepanel import ClonePanel
-from meg_runtime.ui.repopanel import RepoPanel
+import pkg_resources
+from PyQt5 import QtWidgets, QtGui, uic
+from meg_runtime.config import Config
+from meg_runtime.logger import Logger
+from meg_runtime.git import GitManager, GitRepository
+from meg_runtime.app import App
 
 
-class UIManager(QtWidgets.QStackedWidget):
+class UIManager(QtWidgets.QMainWindow):
     """Main UI manager for the MEG system."""
 
-    PANELS = [
-        ClonePanel,
-        MainMenuPanel,
-        RepoPanel,
-    ]
+    DEFAULT_UI_FILE = 'mainwindow.ui'
+
+    # The singleton instance
+    __instance = None
 
     def __init__(self, **kwargs):
         """UI manager constructor."""
-        super().__init__(**kwargs)
-        for panel in self.PANELS:
-            self.addWidget(panel(self))
-        self.change_view(MainMenuPanel)
+        if UIManager.__instance is not None:
+            # Except if another instance is created
+            raise Exception(self.__class__.__name__ + " is a singleton!")
+        else:
+            super().__init__(**kwargs)
+            UIManager.__instance = self
+            # Load base panel resource
+            path = pkg_resources.resource_filename(__name__, UIManager.DEFAULT_UI_FILE)
+            try:
+                uic.loadUi(path, self)
+            except Exception as e:
+                Logger.warning(f'MEG: BasePanel: {e}')
+                Logger.warning(f'MEG: BasePanel: Could not load path {path}')
+            # Set the open repository
+            self._open_repo = None
+            self.change_view(App.get_panel('MainPanel'))
+            # Set the icon
+            icon_path = App.get_icon()
+            if icon_path is not None:
+                self.setWindowIcon(QtGui.QIcon(icon_path))
 
-    def open_clone_panel(self):
+    @staticmethod
+    def get_instance(**kwargs):
+        """Get an instance of the singleton."""
+        if UIManager.__instance is None:
+            UIManager(**kwargs)
+        return UIManager.__instance
+
+    @staticmethod
+    def setup(**kwargs):
+        """Run initial setup of the UI manager."""
+        instance = UIManager.get_instance(**kwargs)
+        instance.show()
+
+    @staticmethod
+    def open_clone_panel():
         """"Download" or clone a project."""
         # TODO
-        self.change_view(ClonePanel)
+        UIManager.change_view(App.get_panel('ClonePanel'))
 
-    def clone(self):
-        """Clone a repository."""
+    @staticmethod
+    def return_to_main():
+        """Return to the main panel"""
+        UIManager.change_view(App.get_panel('MainPanel'))
+
+    @staticmethod
+    def get_changes(repo):
+        """Get changes for the given repo (do a pull)."""
+        repo.pull()
+
+    @staticmethod
+    def send_changes(repo):
+        """Send changes for the given repo."""
         # TODO
-        self.change_view(RepoPanel)
+        pass
 
-    def return_to_main_menu(self):
-        """Return to the main menu screen"""
-        self.change_view(MainMenuPanel)
-
-    def change_view(self, panel):
+    @staticmethod
+    def change_view(panel):
         """Change the current panel being viewed. """
-        self.setCurrentIndex(self.PANELS.index(panel))
+        # Reload the panel before changing the view
+        instance = UIManager.get_instance()
+        if panel and panel.get_title():
+            instance.setWindowTitle(f'{App.get_name()} - {panel.get_title()}')
+        else:
+            instance.setWindowTitle(f'{App.get_name()}')
+        container = instance.findChild(QtWidgets.QWidget, 'centralwidget')
+        if container is not None:
+            widget = None if not panel else panel.get_widgets()
+            layout = container.layout()
+            if layout is not None:
+                for i in reversed(range(layout.count())): 
+                    layout.itemAt(i).widget().setParent(None)
+                if widget:
+                    layout.addWidget(widget)
+            if widget:
+                widget.setParent(container)
 
     # TODO: Add more menu opening/closing methods here

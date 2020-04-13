@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RepoPanel</class>
- <widget class="QWidget" name="RepoPanel">
+ <class>MainPanel</class>
+ <widget class="QWidget" name="MainPanel">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>472</width>
-    <height>301</height>
+    <width>400</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string/>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2">
+  <layout class="QHBoxLayout" name="hoirzontalLayout" stretch="1,2">
    <item>
     <widget class="QWidget" name="verticalLayoutWidget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,0">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -27,36 +27,19 @@
        <number>0</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>11</number>
       </property>
       <item>
-       <widget class="QLabel" name="branchName">
+       <widget class="QPushButton" name="rolesButton">
         <property name="text">
-         <string>Branch Name</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <string>Manage Roles</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="sendChanges">
+       <widget class="QPushButton" name="downloadButton">
         <property name="text">
-         <string>Send Changes</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="getChanges">
-        <property name="text">
-         <string>Get Changes</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="mainMenu">
-        <property name="text">
-         <string>Home</string>
+         <string>Download Project</string>
         </property>
        </widget>
       </item>
@@ -68,7 +51,7 @@
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
-          <height>179</height>
+          <height>211</height>
          </size>
         </property>
        </spacer>
@@ -77,9 +60,17 @@
     </widget>
    </item>
    <item>
-    <widget class="QTreeView" name="treeView"/>
+    <widget class="QTreeWidget" name="treeWidget">
+     <column>
+      <property name="text">
+       <string>Project</string>
+      </property>
+     </column>
+    </widget>
    </item>
   </layout>
+  <zorder>treeWidget</zorder>
+  <zorder>verticalLayoutWidget</zorder>
  </widget>
  <resources/>
  <connections/>

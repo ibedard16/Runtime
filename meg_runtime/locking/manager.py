@@ -26,7 +26,7 @@ class LockingManager:
         Args:
             permissionsManager (PermissionsManager): the active permissions manager
         """
-        if not LockingManager.__instance is None:
+        if LockingManager.__instance is not None:
             raise Exception("Trying to create a second instance of LockingManager, which is a singleton")
         else:
             LockingManager.__instance = self
