@@ -61,6 +61,26 @@ class App(QtWidgets.QApplication):
         """Get a panel by name"""
         return None if not App.__instance else App.__instance.panel(name)
 
+    @staticmethod
+    def refresh_panel(name, **kwargs):
+        """Refresh a panel by name."""
+        instance = App.__instance
+        if instance is None:
+            return None
+        if name in App.PANELS:
+            try:
+                panel_ctor = getattr(ui, name)
+                panel_obj = panel_ctor(**kwargs)
+                instance._panels[panel_obj.get_name()] = panel_obj
+                return panel_obj
+            except Exception as e:
+                Logger.warning(f'MEG UI: {e}')
+                Logger.warning(f'MEG UI: Could not create panel "{name}"')
+        else:
+            Logger.warning(f'MEG UI: Panel does not exist')
+
+        return None
+
     def name(self):
         """Get application name"""
         return App.APP_NAME
