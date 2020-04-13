@@ -13,167 +13,166 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QTreeWidget" name="pluginList">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>40</y>
-     <width>761</width>
-     <height>431</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="indentation">
-    <number>0</number>
-   </property>
-   <property name="uniformRowHeights">
-    <bool>false</bool>
-   </property>
-   <property name="itemsExpandable">
-    <bool>false</bool>
-   </property>
-   <property name="headerHidden">
-    <bool>false</bool>
-   </property>
-   <attribute name="headerVisible">
-    <bool>true</bool>
-   </attribute>
-   <attribute name="headerMinimumSectionSize">
-    <number>75</number>
-   </attribute>
-   <attribute name="headerDefaultSectionSize">
-    <number>75</number>
-   </attribute>
-   <column>
-    <property name="text">
-     <string>Enabled</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Name</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Version</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Author</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Description</string>
-    </property>
-   </column>
-   <item>
-    <property name="text">
-     <string>🔵</string>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Plugin 1</string>
-    </property>
-    <property name="text">
-     <string>1.0.0</string>
-    </property>
-    <property name="text">
-     <string>John Doe</string>
-    </property>
-    <property name="text">
-     <string>A plugin that doesn't really exist</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>⚪</string>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Plugin 2</string>
-    </property>
-    <property name="text">
-     <string>0.1.0</string>
-    </property>
-    <property name="text">
-     <string>Jane Smith</string>
-    </property>
-    <property name="text">
-     <string>A plugin that exists, but not really</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QPushButton" name="enableButton">
-   <property name="geometry">
-    <rect>
-     <x>530</x>
-     <y>480</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Enable</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="disableButton">
-   <property name="geometry">
-    <rect>
-     <x>610</x>
-     <y>480</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Disable</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="uninstallButton">
-   <property name="geometry">
-    <rect>
-     <x>690</x>
-     <y>480</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Uninstall</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="pluginLabel">
+  <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>101</width>
-     <height>31</height>
+     <width>761</width>
+     <height>491</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <pointsize>14</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>Plugins</string>
-   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="pluginLabel">
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Plugins</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTreeWidget" name="pluginList">
+      <property name="font">
+       <font>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="indentation">
+       <number>0</number>
+      </property>
+      <property name="uniformRowHeights">
+       <bool>false</bool>
+      </property>
+      <property name="itemsExpandable">
+       <bool>false</bool>
+      </property>
+      <property name="headerHidden">
+       <bool>false</bool>
+      </property>
+      <attribute name="headerVisible">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="headerMinimumSectionSize">
+       <number>75</number>
+      </attribute>
+      <attribute name="headerDefaultSectionSize">
+       <number>75</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>Enabled</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Name</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Version</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Author</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Description</string>
+       </property>
+      </column>
+      <item>
+       <property name="text">
+        <string>🔵</string>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Plugin 1</string>
+       </property>
+       <property name="text">
+        <string>1.0.0</string>
+       </property>
+       <property name="text">
+        <string>John Doe</string>
+       </property>
+       <property name="text">
+        <string>A plugin that doesn't really exist</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>⚪</string>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Plugin 2</string>
+       </property>
+       <property name="text">
+        <string>0.1.0</string>
+       </property>
+       <property name="text">
+        <string>Jane Smith</string>
+       </property>
+       <property name="text">
+        <string>A plugin that exists, but not really</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="enableButton">
+        <property name="text">
+         <string>Enable</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="disableButton">
+        <property name="text">
+         <string>Disable</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="uninstallButton">
+        <property name="text">
+         <string>Uninstall</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>
