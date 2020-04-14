@@ -5,7 +5,6 @@ from meg_runtime.config import Config
 from meg_runtime.ui.manager import UIManager
 from meg_runtime.ui.basepanel import BasePanel
 from meg_runtime.ui.filechooser import FileChooser
-from meg_runtime.ui.helpers import PanelException
 
 
 class ClonePanel(BasePanel):

@@ -3,7 +3,6 @@
 
 import pkg_resources
 from PyQt5 import QtWidgets, QtGui, uic
-import sys
 from meg_runtime.config import Config
 from meg_runtime.logger import Logger
 from meg_runtime.git import GitManager, GitRepository
@@ -40,7 +39,7 @@ class UIManager(QtWidgets.QMainWindow):
             self._action_open = self.findChild(QtWidgets.QAction, 'action_Open')
             self._action_open.triggered.connect(UIManager.open_clone_panel)
             self._action_quit = self.findChild(QtWidgets.QAction, 'action_Quit')
-            self._action_quit.triggered.connect(sys.exit)
+            self._action_quit.triggered.connect(App.quit)
             self._action_about = self.findChild(QtWidgets.QAction, 'action_About')
             self._action_about.triggered.connect(UIManager.open_about)
             self._action_manage_plugins = self.findChild(QtWidgets.QAction, 'action_Manage_Plugins')
@@ -64,17 +63,14 @@ class UIManager(QtWidgets.QMainWindow):
     def open_about():
         """Open the about menu."""
         instance = UIManager.get_instance()
-        desc = ('<center>'
-                '<h1>Multimedia Extensible Git</h1>'
-                '<p>Version 0.1</p>'
-                '</center>')
-        QtWidgets.QMessageBox.about(instance, "About MEG", desc)
+        desc = (f'<center><h3>{App.get_name()}</h3><p>Version {App.get_version()}</p></center>')
+        QtWidgets.QMessageBox.about(instance, f'About {App.get_name()}', desc)
 
     @staticmethod
     def open_manage_plugins():
         """Open the manage plugins window."""
         UIManager.change_view(App.refresh_panel('PluginsPanel'))
-    
+
     @staticmethod
     def open_add_plugin():
         """"Open the new plugin window"""

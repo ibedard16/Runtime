@@ -4,13 +4,13 @@ from meg_runtime.ui.manager import UIManager
 from meg_runtime.plugins import PluginManager
 from meg_runtime.ui.basepanel import BasePanel
 
+
 class AddPluginPanel(BasePanel):
     """Setup the plugin panel."""
 
-    selected_file = None
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.selected_file = None
 
     def get_title(self):
         """Get the title of this panel."""
@@ -20,8 +20,9 @@ class AddPluginPanel(BasePanel):
         """Load dynamic elements within the panel."""
         self.attach_handlers()
         self.reset_form()
+        PluginManager.update_cache()
         self.bind_available_plugins()
-    
+
     def attach_handlers(self):
         """Initialize component by attaching handlers for form fields"""
         instance = self.get_widgets()
@@ -42,14 +43,14 @@ class AddPluginPanel(BasePanel):
         self.url_radio_button = instance.findChild(QtWidgets.QRadioButton, 'urlRadioButton')
         self.url_radio_button.clicked.connect(self.enable_url_selection)
         self.url_field = instance.findChild(QtWidgets.QLineEdit, 'urlField')
-    
+
     def reset_form(self):
         """clear all form values"""
         self.available_radio_button.setChecked(True)
         self.available_plugin_list.clear()
         self.file_label.setText('')
         self.url_field.setText('')
-    
+
     def bind_available_plugins(self):
         """Add all available plugins to the available plugin list"""
         available_plugins = PluginManager.get_all_available()
@@ -106,7 +107,7 @@ class AddPluginPanel(BasePanel):
         """disables the file selection fields"""
         self.choose_file_button.setEnabled(False)
         self.file_label.setEnabled(False)
-    
+
     def disable_url_selection(self):
         """disables the url selection fields"""
         self.url_field.setEnabled(False)

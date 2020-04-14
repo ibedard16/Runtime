@@ -1,9 +1,11 @@
 
 from PyQt5 import QtWidgets
 
+from meg_runtime import Config
 from meg_runtime.plugins import PluginManager
 from meg_runtime.ui.basepanel import BasePanel
 from meg_runtime.ui.manager import UIManager
+
 
 class PluginsPanel(BasePanel):
     """Setup the plugin panel."""
@@ -49,44 +51,39 @@ class PluginsPanel(BasePanel):
 
     def changeButtonStates(self):
         selectedPlugin = self.getCurrentPlugin()
-        if (selectedPlugin is None):
+        if selectedPlugin is None:
             self.enable_button.setEnabled(False)
             self.disable_button.setEnabled(False)
             self.uninstall_button.setEnabled(False)
-            return
-        self.enable_button.setEnabled(not selectedPlugin.enabled())
-        self.disable_button.setEnabled(selectedPlugin.enabled())
-        self.uninstall_button.setEnabled(True)
+        else:
+            self.enable_button.setEnabled(not selectedPlugin.enabled())
+            self.disable_button.setEnabled(selectedPlugin.enabled())
+            self.uninstall_button.setEnabled(True)
 
     def enableCurrentPlugin(self):
         selectedPlugin = self.getCurrentPlugin()
-        if (selectedPlugin is None):
-            return
-        PluginManager.enable(selectedPlugin.name())
-        self.refreshPluginList()
+        if selectedPlugin is not None:
+            PluginManager.load_and_enable(selectedPlugin.name())
+            Config.save()
+            self.refreshPluginList()
 
     def disableCurrentPlugin(self):
         selectedPlugin = self.getCurrentPlugin()
-        if (selectedPlugin is None):
-            return
-        PluginManager.disable(selectedPlugin.name())
-        self.refreshPluginList()
+        if selectedPlugin is not None:
+            PluginManager.disable(selectedPlugin.name())
+            Config.save()
+            self.refreshPluginList()
 
     def uninstallCurrentPlugin(self):
         selectedPlugin = self.getCurrentPlugin()
-        if (selectedPlugin is None):
-            return
-        PluginManager.uninstall(selectedPlugin.name())
-        self.refreshPluginList()
+        if selectedPlugin is not None:
+            PluginManager.uninstall(selectedPlugin.name())
+            Config.save()
+            self.refreshPluginList()
 
     def getCurrentPlugin(self):
         selectedPluginItem = self.plugin_list.currentItem()
-        if (selectedPluginItem is None):
+        if selectedPluginItem is None:
             return None
         selectedPluginName = selectedPluginItem.text(1)
         return PluginManager.get(selectedPluginName)
-
-    
-
-
-

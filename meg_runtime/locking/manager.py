@@ -9,7 +9,6 @@ Working directory should be changed by the git module
 
 import os
 from meg_runtime.locking.lockFile import LockFile
-from meg_runtime.logger import Logger
 
 
 class LockingManager:
@@ -50,7 +49,7 @@ class LockingManager:
             LockingManager.__instance._lockFile[filepath] = username
             LockingManager.__instance.updateLocks()
             return True
-        
+
     @staticmethod
     def removeLock(filepath, username):
         """Sync the repo, remove a lock from a file, and sync again
@@ -66,13 +65,14 @@ class LockingManager:
         lock = LockingManager.__instance._lockFile[filepath]
         if(lock is None):
             return True
-        elif(lock["user"] == username or False): #TODO check that user role can remove other user's locks
-            del LockingManager.__instance._lockFile[filepath] 
+        elif(lock["user"] == username or False):
+            # TODO: check that user role can remove other user's locks
+            del LockingManager.__instance._lockFile[filepath]
         else:
             return False
         LockingManager.__instance.updateLocks()
         return True
-        
+
     @staticmethod
     def findLock(filepath):
         """Find if there is a lock on the file, does not automatily sync the lock file
@@ -94,15 +94,13 @@ class LockingManager:
     def updateLocks():
         """Syncronizes the local locks with the remote locks, manually merge local data with remote
         """
-        #TODO Sync with repo, as described below
-        """
-        https://www.quora.com/How-can-I-pull-one-file-from-a-Git-repository-instead-of-the-entire-project/answer/Aarti-Dwivedi
-        fetch
-        checkout from latest commit lock and permissions files
-        create new LockFile object off of it and merge with current object
-        save date
-        if lockfile has changed stage, commit, and push it
-        """
+        # TODO: Sync with repo, as described below
+        # https://www.quora.com/How-can-I-pull-one-file-from-a-Git-repository-instead-of-the-entire-project/answer/Aarti-Dwivedi
+        # fetch
+        # checkout from latest commit lock and permissions files
+        # create new LockFile object off of it and merge with current object
+        # save date
+        # if lockfile has changed stage, commit, and push it
         if LockingManager.__instance is None:
             LockingManager()
         LockingManager.__instance._lockFile.save()

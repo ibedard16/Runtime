@@ -22,6 +22,16 @@
       "problemMatcher": []
     },
     {
+      "label": "Lint",
+      "type": "shell",
+      "windows": {
+        "command": "py -3 -m pipenv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=250 --statistics"
+      },
+      "command": "python3 -m pipenv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=250 --statistics",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
       "label": "Test",
       "type": "shell",
       "windows": {

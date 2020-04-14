@@ -547,6 +547,20 @@ class PluginManager(dict):
             retval = PluginManager.setup(name) and retval
         return retval
 
+    # Load and enable plugin by name
+    @staticmethod
+    def load_and_enable(name):
+        """Enable and load plugin by name"""
+        # Check there is plugin manager instance
+        if PluginManager.__instance is None:
+            PluginManager()
+        if PluginManager.__instance is None:
+            return False
+        # Load the plugin
+        if not PluginManager.__instance.load(name):
+            return False
+        return PluginManager.__instance.enable(name)
+
     # Load plugin by name
     @staticmethod
     def load(name):

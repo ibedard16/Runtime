@@ -7,13 +7,12 @@ from meg_runtime.logger import Logger
 from meg_runtime.ui.manager import UIManager
 from meg_runtime.ui.basepanel import BasePanel
 from meg_runtime.ui.filechooser import FileChooser
-from meg_runtime.ui.helpers import PanelException
 
 
 class RepoPanel(BasePanel):
     """Setup the main file panel."""
 
-    def __init__(self, repo_url=None, repo_path=None, repo=None,**kwargs):
+    def __init__(self, repo_url=None, repo_path=None, repo=None, **kwargs):
         """RepoPanel constructor."""
         self._repo_url = repo_url
         self._repo_path = repo_path
@@ -33,7 +32,6 @@ class RepoPanel(BasePanel):
 
     def get_title(self):
         """Get the title of this panel."""
-        instance = self.get_widgets()
         return self.title
 
     def get_changes(self):
