@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>Form</class>
  <widget class="QWidget" name="Form">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -15,7 +18,20 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
+    <widget class="QRadioButton" name="availableRadioButton">
+     <property name="text">
+      <string>Choose Available Plugin</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QTreeWidget" name="availablePluginList">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <column>
       <property name="text">
        <string>Name</string>
@@ -36,6 +52,75 @@
        <string>Description</string>
       </property>
      </column>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="fileRadioButton">
+     <property name="text">
+      <string>Select File</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="horizontalWidget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QPushButton" name="chooseFileButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="whatsThis">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Choose File</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="fileLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="urlRadioButton">
+     <property name="text">
+      <string>Provide Plugin URL</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="urlField">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
     </widget>
    </item>
    <item>
