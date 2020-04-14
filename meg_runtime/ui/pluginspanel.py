@@ -17,10 +17,11 @@ class PluginsPanel(BasePanel):
 
     def on_load(self):
         """Load dynamic elements within the panel."""
+        self.attachHandlers()
+        self.refreshPluginList()
 
-        # Attach handlers
+    def attachHandlers(self):
         instance = self.get_widgets()
-
         self.enable_button = instance.findChild(QtWidgets.QPushButton, 'enableButton')
         self.enable_button.clicked.connect(self.enableCurrentPlugin)
         self.disable_button = instance.findChild(QtWidgets.QPushButton, 'disableButton')
@@ -29,11 +30,8 @@ class PluginsPanel(BasePanel):
         self.uninstall_button.clicked.connect(self.uninstallCurrentPlugin)
         self.add_button = instance.findChild(QtWidgets.QPushButton, 'addButton')
         self.add_button.clicked.connect(UIManager.open_add_plugin)
-
         self.plugin_list = instance.findChild(QtWidgets.QTreeWidget, 'pluginList')
         self.plugin_list.itemSelectionChanged.connect(self.changeButtonStates)
-
-        self.refreshPluginList()
 
     def refreshPluginList(self):
         self.plugin_list.clear()
@@ -46,7 +44,6 @@ class PluginsPanel(BasePanel):
                 plugin.author(),
                 plugin.description()
             ]))
-        
         # disable buttons
         self.changeButtonStates()
 
@@ -57,7 +54,6 @@ class PluginsPanel(BasePanel):
             self.disable_button.setEnabled(False)
             self.uninstall_button.setEnabled(False)
             return
-
         self.enable_button.setEnabled(not selectedPlugin.enabled())
         self.disable_button.setEnabled(selectedPlugin.enabled())
         self.uninstall_button.setEnabled(True)
@@ -66,7 +62,6 @@ class PluginsPanel(BasePanel):
         selectedPlugin = self.getCurrentPlugin()
         if (selectedPlugin is None):
             return
-        
         PluginManager.enable(selectedPlugin.name())
         self.refreshPluginList()
 
@@ -74,7 +69,6 @@ class PluginsPanel(BasePanel):
         selectedPlugin = self.getCurrentPlugin()
         if (selectedPlugin is None):
             return
-        
         PluginManager.disable(selectedPlugin.name())
         self.refreshPluginList()
 
@@ -82,7 +76,6 @@ class PluginsPanel(BasePanel):
         selectedPlugin = self.getCurrentPlugin()
         if (selectedPlugin is None):
             return
-        
         PluginManager.uninstall(selectedPlugin.name())
         self.refreshPluginList()
 
@@ -90,7 +83,6 @@ class PluginsPanel(BasePanel):
         selectedPluginItem = self.plugin_list.currentItem()
         if (selectedPluginItem is None):
             return None
-        
         selectedPluginName = selectedPluginItem.text(1)
         return PluginManager.get(selectedPluginName)
 
