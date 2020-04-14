@@ -1,8 +1,8 @@
 
 from PyQt5 import QtWidgets
 
+from meg_runtime.plugins import PluginManager
 from meg_runtime.ui.basepanel import BasePanel
-from meg_runtime.logger import Logger
 
 
 class PluginsPanel(BasePanel):
@@ -11,11 +11,11 @@ class PluginsPanel(BasePanel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def get_title():
+    def get_title(self):
         """Get the title of this panel."""
         return 'Plugins'
 
-    def on_load():
+    def on_load(self):
         """Load dynamic elements within the panel."""
 
         # Attach handlers
@@ -28,14 +28,20 @@ class PluginsPanel(BasePanel):
         #self.uninstall_button.clicked.connect()
         self.plugin_list = instance.findChild(QtWidgets.QTreeWidget, 'pluginList')
 
+        self.plugin_list.clear()
+
         # Add the file viewer/chooser
-        pluginManager = PluginManager.get_instance();
-        plugins = pluginManager.get_all()
-        pluginItems = [
-            QtWidgets.QTreeWidgetItem([
-                '🔵' if plugin.enabled()  else '⚪' 
-            ])
-            for plugin in plugins
-        ]
-        self.plugin_list.addTopLevelItem(pluginItems)
+        plugins = PluginManager.get_all()
+        for plugin in plugins:
+            self.plugin_list.addTopLevelItem(QtWidgets.QTreeWidgetItem([
+                '🔵' if plugin.enabled() else '⚪',
+                plugin.name(),
+                plugin.version(),
+                plugin.author(),
+                plugin.description()
+            ]))
+        
+        self.plugin_list.addTopLevelItem(QtWidgets.QTreeWidgetItem([
+                '🔵', 'test', '1.1.1', 'Isaac', 'A dynamic plugin that only exists to populate a list'
+            ]))
 
