@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>780</width>
-    <height>512</height>
+    <width>400</width>
+    <height>511</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Plugins</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -129,6 +129,45 @@
     <widget class="QWidget" name="horizontalWidget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
+       <widget class="QPushButton" name="enableButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Enable</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="disableButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Disable</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="uninstallButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Uninstall</string>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -142,23 +181,12 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="enableButton">
-        <property name="text">
-         <string>Enable</string>
+       <widget class="QPushButton" name="addButton">
+        <property name="enabled">
+         <bool>true</bool>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="disableButton">
         <property name="text">
-         <string>Disable</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="uninstallButton">
-        <property name="text">
-         <string>Uninstall</string>
+         <string>Add New</string>
         </property>
        </widget>
       </item>

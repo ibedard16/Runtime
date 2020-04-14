@@ -74,6 +74,11 @@ class UIManager(QtWidgets.QMainWindow):
     def open_manage_plugins():
         """Open the manage plugins window."""
         UIManager.change_view(App.refresh_panel('PluginsPanel'))
+    
+    @staticmethod
+    def open_add_plugin():
+        """"Open the new plugin window"""
+        UIManager.change_view(App.refresh_panel('AddPluginPanel'))
 
     @staticmethod
     def clone(username, password, repo_url, repo_path):

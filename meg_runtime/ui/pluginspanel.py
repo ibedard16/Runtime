@@ -3,7 +3,7 @@ from PyQt5 import QtWidgets
 
 from meg_runtime.plugins import PluginManager
 from meg_runtime.ui.basepanel import BasePanel
-
+from meg_runtime.ui.manager import UIManager
 
 class PluginsPanel(BasePanel):
     """Setup the plugin panel."""
@@ -26,6 +26,8 @@ class PluginsPanel(BasePanel):
         #self.disable_button.clicked.connect()
         self.uninstall_button = instance.findChild(QtWidgets.QPushButton, 'uninstallButton')
         #self.uninstall_button.clicked.connect()
+        self.add_button = instance.findChild(QtWidgets.QPushButton, 'addButton')
+        self.add_button.clicked.connect(UIManager.open_add_plugin)
         self.plugin_list = instance.findChild(QtWidgets.QTreeWidget, 'pluginList')
 
         self.plugin_list.clear()
@@ -44,4 +46,5 @@ class PluginsPanel(BasePanel):
         self.plugin_list.addTopLevelItem(QtWidgets.QTreeWidgetItem([
                 '🔵', 'test', '1.1.1', 'Isaac', 'A dynamic plugin that only exists to populate a list'
             ]))
+
 

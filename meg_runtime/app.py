@@ -21,6 +21,7 @@ class App(QtWidgets.QApplication):
         'ClonePanel',
         'RepoPanel',
         'PluginsPanel',
+        'AddPluginPanel',
     ]
 
     __instance = None
