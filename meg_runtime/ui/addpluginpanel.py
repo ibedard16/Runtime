@@ -127,4 +127,4 @@ class AddPluginPanel(BasePanel):
         messageBox = QtWidgets.QMessageBox()
         messageBox.setIcon(QtWidgets.QMessageBox.Critical)
         messageBox.setText(message)
-        messageBox.exec();
+        messageBox.exec()

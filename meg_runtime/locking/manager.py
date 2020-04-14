@@ -37,9 +37,9 @@ class LockingManager:
         """Sync the repo, adds the lock, sync the repo
         Args:
             filepath (string): path to the file to lock
-            username (string): username of cuerrent user
+            username (string): username of current user
         Returns:
-            (bool): was lock sucessfuly added
+            (bool): was lock successfully added
         """
         if LockingManager.__instance is None:
             LockingManager()
