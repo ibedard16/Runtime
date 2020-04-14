@@ -40,7 +40,7 @@ class PluginsPanel(BasePanel):
         plugins = PluginManager.get_all()
         for plugin in plugins:
             self.plugin_list.addTopLevelItem(QtWidgets.QTreeWidgetItem([
-                '🔵' if plugin.enabled() else '⚪',
+                chr(128309) if plugin.enabled() else chr(9898),
                 plugin.name(),
                 plugin.version(),
                 plugin.author(),
