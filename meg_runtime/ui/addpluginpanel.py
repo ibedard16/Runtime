@@ -33,6 +33,8 @@ class AddPluginPanel(BasePanel):
         self.available_radio_button = instance.findChild(QtWidgets.QRadioButton, 'availableRadioButton')
         self.available_radio_button.clicked.connect(self.enable_available_selection)
         self.available_plugin_list = instance.findChild(QtWidgets.QTreeWidget, 'availablePluginList')
+        self.refresh_available_button = instance.findChild(QtWidgets.QPushButton, 'refreshAvailableButton')
+        self.refresh_available_button.clicked.connect(self.refreshAvailableList)
         # file plugin handlers
         self.file_radio_button = instance.findChild(QtWidgets.QRadioButton, 'fileRadioButton')
         self.file_radio_button.clicked.connect(self.enable_file_selection)
@@ -47,12 +49,12 @@ class AddPluginPanel(BasePanel):
     def reset_form(self):
         """clear all form values"""
         self.available_radio_button.setChecked(True)
-        self.available_plugin_list.clear()
         self.file_label.setText('')
         self.url_field.setText('')
 
     def bind_available_plugins(self):
         """Add all available plugins to the available plugin list"""
+        self.available_plugin_list.clear()
         available_plugins = PluginManager.get_all_available()
         for plugin in available_plugins:
             self.available_plugin_list.addTopLevelItem(QtWidgets.QTreeWidgetItem([
@@ -126,3 +128,8 @@ class AddPluginPanel(BasePanel):
         messageBox.setIcon(QtWidgets.QMessageBox.Critical)
         messageBox.setText(message)
         messageBox.exec()
+    
+    def refreshAvailableList(self):
+        """refresh list of available plugins"""
+        PluginManager.update_cache()
+        self.bind_available_plugins()
