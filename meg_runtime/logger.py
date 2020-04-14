@@ -22,21 +22,21 @@ class Logger(object):
 
     @staticmethod
     def debug(message):
-        if Logger.__instance is not None:
+        if Logger.__instance is None:
             Logger()
         if Logger.__instance and Logger.__instance.logger:
             Logger.__instance.logger.debug(message)
 
     @staticmethod
     def info(message):
-        if Logger.__instance is not None:
+        if Logger.__instance is None:
             Logger()
         if Logger.__instance and Logger.__instance.logger:
             Logger.__instance.logger.info(message)
 
     @staticmethod
     def warning(message):
-        if Logger.__instance is not None:
+        if Logger.__instance is None:
             Logger()
         if Logger.__instance and Logger.__instance.logger:
             Logger.__instance.logger.warning(message)
