@@ -8,7 +8,7 @@ from meg_runtime.logger import Logger
 class PluginsPanel(BasePanel):
     """Setup the plugin panel."""
 
-    def __init__(self, manager, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     def get_title():
