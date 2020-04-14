@@ -47,8 +47,7 @@ class UIManager(QtWidgets.QMainWindow):
             self._action_manage_plugins.triggered.connect(UIManager.open_manage_plugins)
             # Set the open repository
             self._open_repo = None
-            #self.change_view(App.get_panel('MainPanel'))
-            self.change_view(App.get_panel('PluginsPanel'))
+            self.change_view(App.get_panel('MainPanel'))
             # Set the icon
             icon_path = App.get_icon()
             if icon_path is not None:
@@ -74,8 +73,7 @@ class UIManager(QtWidgets.QMainWindow):
     @staticmethod
     def open_manage_plugins():
         """Open the manage plugins window."""
-        # TODO
-        pass
+        UIManager.change_view(App.refresh_panel('PluginsPanel'))
 
     @staticmethod
     def clone(username, password, repo_url, repo_path):
@@ -120,11 +118,6 @@ class UIManager(QtWidgets.QMainWindow):
         """"Download" or clone a project."""
         # TODO
         UIManager.change_view(App.refresh_panel('ClonePanel'))
-
-    @staticmethod
-    def open_plugins_panel():
-        """Manage installed plugins"""
-        UIManager.change_view(App.get_panel('PluginsPanel'))
 
     @staticmethod
     def return_to_main():
