@@ -138,6 +138,12 @@ class App(QtWidgets.QApplication):
         ui.UIManager.push_view(ui.AddPluginPanel())
 
     @staticmethod
+    def open_manage_roles():
+        """Open the manage plugins window."""
+        ui.UIManager.push_view(ui.RolesPanel())
+
+
+    @staticmethod
     def clone(username, password, repo_url, repo_path):
         """Clone a repository."""
         # TODO: Handle username + password

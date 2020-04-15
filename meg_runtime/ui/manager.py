@@ -43,6 +43,8 @@ class UIManager(QtWidgets.QMainWindow):
             self._action_about.triggered.connect(App.open_about)
             self._action_manage_plugins = self.findChild(QtWidgets.QAction, 'action_Manage_Plugins')
             self._action_manage_plugins.triggered.connect(App.open_manage_plugins)
+            self._action_manage_roles = self.findChild(QtWidgets.QAction, 'action_Manage_Roles')
+            self._action_manage_roles.triggered.connect(App.open_manage_roles)
             # Set the default title
             self._update_title()
             # Set the icon
