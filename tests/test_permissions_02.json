@@ -1,0 +1,25 @@
+{
+    "roles": {
+        "default": [],
+        "admin": []
+    },
+    "files": {
+        "path/demo.txt": {
+            "roles_write": ["admin"],
+            "users_write": []
+        }
+    },
+    "general": {
+        "users_remove_locks": [],
+        "roles_remove_locks": ["default", "admin"],
+        "users_add_locks": [],
+        "roles_add_locks": ["default", "admin"],
+        "users_write": [],
+        "roles_write": ["default", "admin"],
+        "users_grant": [],
+        "roles_grant": ["default", "admin"],
+        "users_modify_roles": [],
+        "roles_modify_roles": ["default", "admin"]
+    }
+
+}

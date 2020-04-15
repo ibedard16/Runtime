@@ -128,7 +128,7 @@ class AddPluginPanel(BasePanel):
         messageBox.setIcon(QtWidgets.QMessageBox.Critical)
         messageBox.setText(message)
         messageBox.exec()
-    
+
     def refreshAvailableList(self):
         """refresh list of available plugins"""
         PluginManager.update_cache()

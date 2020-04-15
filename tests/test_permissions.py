@@ -9,25 +9,27 @@ from meg_runtime import PermissionsManager
 def change_to_test_directory():
     cd = os.getcwd()
     os.chdir(os.path.dirname(__file__))
+    defaultPermFile = PermissionsManager.PERMISSION_FILE
     yield
+    PermissionsManager.PERMISSION_FILE = defaultPermFile
     os.chdir(cd)
 
 
 def test_permissions_00(change_to_test_directory):
-    perms = PermissionsManager('test_permissions_00.json', 'abc8')
+    PermissionsManager.PERMISSION_FILE = 'test_permissions_00.json'
+    PermissionsManager()
 
 
 def test_permissions_01(change_to_test_directory):
-    perms = PermissionsManager('test_permissions_01.json', 'user2')
+    PermissionsManager.PERMISSION_FILE = 'test_permissions_01.json'
+    perms = PermissionsManager()
 
-    assert perms.can_read('a')
-    assert not perms.can_write('a')
+    assert not perms.can_write('user2', 'a')
 
 
 def test_permissions_02(change_to_test_directory):
-    perms = PermissionsManager('test_permissions_01.json', 'user1')
+    PermissionsManager.PERMISSION_FILE = 'test_permissions_01.json'
+    perms = PermissionsManager()
 
-    assert perms.can_read('a')
-    assert perms.can_write('a')
-    assert not perms.can_read('b')
-    assert not perms.can_write('b')
+    assert perms.can_write('user1', 'a')
+    assert not perms.can_write('user1', 'b')

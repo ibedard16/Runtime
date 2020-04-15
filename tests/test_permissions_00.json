@@ -3,5 +3,17 @@
         "manager": [],
         "engineer": []
     },
-    "files": {}
+    "files": {},
+    "general": {
+        "users_remove_locks": [],
+        "roles_remove_locks": [],
+        "users_add_locks": [],
+        "roles_add_locks": [],
+        "users_write": [],
+        "roles_write": [],
+        "users_grant": [],
+        "roles_grant": [],
+        "users_modify_roles": [],
+        "roles_modify_roles": []
+    }
 }
