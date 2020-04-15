@@ -10,10 +10,7 @@
         "PYTHONPATH": "${workspaceFolder}"
       },
       "program": "${workspaceFolder}/meg_runtime/__main__.py",
-      "console": "integratedTerminal",
-      "args": [
-        "-d"
-      ]
+      "console": "integratedTerminal"
     }
   ]
 }

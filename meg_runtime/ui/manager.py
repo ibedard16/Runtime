@@ -46,6 +46,7 @@ class UIManager(QtWidgets.QMainWindow):
             self._action_manage_plugins.triggered.connect(UIManager.open_manage_plugins)
             # Set the open repository
             self._open_repo = None
+            self._current_panel = None
             self.change_view(App.get_panel('MainPanel'))
             # Set the icon
             icon_path = App.get_icon()
@@ -140,20 +141,36 @@ class UIManager(QtWidgets.QMainWindow):
     def change_view(panel):
         """Change the current panel being viewed. """
         instance = UIManager.get_instance()
-        if panel and panel.get_title():
-            instance.setWindowTitle(f'{App.get_name()} - {panel.get_title()}')
-        else:
-            instance.setWindowTitle(f'{App.get_name()}')
-        container = instance.findChild(QtWidgets.QWidget, 'centralwidget')
-        if container is not None:
-            widget = None if not panel else panel.get_widgets()
-            layout = container.layout()
-            if layout is not None:
-                for i in reversed(range(layout.count())):
-                    layout.itemAt(i).widget().setParent(None)
-                if widget:
-                    layout.addWidget(widget)
-            if widget:
-                widget.setParent(container)
+        if instance:
+            # Hide the current panel, if any
+            if instance._current_panel:
+                instance._current_panel.on_hide()
+            # Set the new window title, if provided by the panel
+            if panel and panel.get_title():
+                instance.setWindowTitle(f'{App.get_name()} - {panel.get_title()}')
+            else:
+                instance.setWindowTitle(f'{App.get_name()}')
+            # Get the window central widget
+            container = instance.findChild(QtWidgets.QWidget, 'centralwidget')
+            if container is not None:
+                # Get the widgets for the panel
+                widgets = None if not panel else panel.get_widgets()
+                # Get the window layout
+                layout = container.layout()
+                if layout is not None:
+                    # Remove all the previous panel widgets
+                    for i in reversed(range(layout.count())):
+                        layout.itemAt(i).widget().setParent(None)
+                    # Add the new panel widgets, if applicable
+                    if widgets:
+                        layout.addWidget(widgets)
+                # Set the new widgets, if applicable
+                if widgets:
+                    # Set the new parent of the container
+                    widgets.setParent(container)
+                    # Show the new panel
+                    panel.on_show()
+            # Set the new panel
+            instance._current_panel = panel
 
     # TODO: Add more menu opening/closing methods here
