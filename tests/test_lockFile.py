@@ -1,6 +1,7 @@
 import pytest
 import os
-from meg_runtime.locking.lockFile import LockFile
+import shutil
+from meg_runtime.git.lockFile import LockFile
 
 
 @pytest.fixture()
@@ -8,8 +9,7 @@ def generateLockfile():
     fileName = ".meg/templockfile"
     LockFile(fileName)  # Generate lockfile
     yield fileName
-    os.remove(fileName)
-    os.rmdir(".meg")
+    shutil.rmtree(".meg")
 
 
 @pytest.fixture()
