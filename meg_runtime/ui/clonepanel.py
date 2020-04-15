@@ -1,8 +1,7 @@
 
 from PyQt5 import QtWidgets
-
+from meg_runtime.app import App
 from meg_runtime.config import Config
-from meg_runtime.ui.manager import UIManager
 from meg_runtime.ui.basepanel import BasePanel
 from meg_runtime.ui.filechooser import FileChooser
 
@@ -23,7 +22,7 @@ class ClonePanel(BasePanel):
         if path is not None:
             repo_path = path
         # Pass control to the manager
-        UIManager.clone(username, password, repo_url, repo_path)
+        App.clone(username, password, repo_url, repo_path)
 
     def get_title(self):
         """Get the title of this panel."""
@@ -36,7 +35,7 @@ class ClonePanel(BasePanel):
         self.ok_button = instance.findChild(QtWidgets.QPushButton, 'okButton')
         self.ok_button.clicked.connect(self.clone)
         self.back_button = instance.findChild(QtWidgets.QPushButton, 'backButton')
-        self.back_button.clicked.connect(UIManager.return_to_main)
+        self.back_button.clicked.connect(App.return_to_main)
         self.server_text_edit = instance.findChild(QtWidgets.QTextEdit, 'server')
         self.username_text_edit = instance.findChild(QtWidgets.QTextEdit, 'username')
         self.password_text_edit = instance.findChild(QtWidgets.QTextEdit, 'password')

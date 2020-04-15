@@ -1,10 +1,10 @@
 
 from PyQt5 import QtWidgets
 
-from meg_runtime import Config
-from meg_runtime.plugins import PluginManager
+from meg_runtime.app import App
+from meg_runtime.config import Config
+from meg_runtime.plugins.manager import PluginManager
 from meg_runtime.ui.basepanel import BasePanel
-from meg_runtime.ui.manager import UIManager
 
 
 class PluginsPanel(BasePanel):
@@ -31,7 +31,7 @@ class PluginsPanel(BasePanel):
         self.uninstall_button = instance.findChild(QtWidgets.QPushButton, 'uninstallButton')
         self.uninstall_button.clicked.connect(self.uninstallCurrentPlugin)
         self.add_button = instance.findChild(QtWidgets.QPushButton, 'addButton')
-        self.add_button.clicked.connect(UIManager.open_add_plugin)
+        self.add_button.clicked.connect(App.open_add_plugin)
         self.plugin_list = instance.findChild(QtWidgets.QTreeWidget, 'pluginList')
         self.plugin_list.itemSelectionChanged.connect(self.changeButtonStates)
 

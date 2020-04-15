@@ -2,9 +2,9 @@
 import os.path
 from PyQt5 import QtWidgets
 
+from meg_runtime.app import App
 from meg_runtime.config import Config
 from meg_runtime.logger import Logger
-from meg_runtime.ui.manager import UIManager
 from meg_runtime.ui.basepanel import BasePanel
 from meg_runtime.ui.filechooser import FileChooser
 
@@ -37,17 +37,17 @@ class RepoPanel(BasePanel):
     def get_changes(self):
         """Do a pull for the repository."""
         if self._repo is not None:
-            UIManager.get_changes(self._repo)
+            App.get_changes(self._repo)
 
     def on_load(self):
         """Load dynamic elements within the panel."""
         instance = self.get_widgets()
         self._main_button = instance.findChild(QtWidgets.QPushButton, 'mainMenu')
-        self._main_button.clicked.connect(UIManager.return_to_main)
+        self._main_button.clicked.connect(App.return_to_main)
         self._get_changes_button = instance.findChild(QtWidgets.QPushButton, 'getChanges')
         self._get_changes_button.clicked.connect(self.get_changes)
         self._send_changes_button = instance.findChild(QtWidgets.QPushButton, 'sendChanges')
-        self._send_changes_button.clicked.connect(UIManager.send_changes)
+        self._send_changes_button.clicked.connect(App.send_changes)
         self._branch_name_label = instance.findChild(QtWidgets.QLabel, 'branchName')
         # Setup the tree view of the repo if the repo folder exists
         path = Config.get('paths/user')

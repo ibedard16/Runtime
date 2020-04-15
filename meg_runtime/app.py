@@ -4,8 +4,9 @@
 import pkg_resources
 from PyQt5 import QtWidgets
 from meg_runtime.config import Config
-from meg_runtime.plugins import PluginManager
 from meg_runtime.logger import Logger
+from meg_runtime.git import GitManager, GitRepository
+from meg_runtime.plugins import PluginManager
 from meg_runtime import ui
 
 
@@ -16,13 +17,6 @@ class App(QtWidgets.QApplication):
     NAME = 'Multimedia Extensible Git'
     VERSION = '0.1'
     ICON_PATH = 'meg.ico'
-    PANELS = [
-        'MainPanel',
-        'ClonePanel',
-        'RepoPanel',
-        'PluginsPanel',
-        'AddPluginPanel',
-    ]
 
     __instance = None
 
@@ -36,12 +30,19 @@ class App(QtWidgets.QApplication):
             # Initialize super class constructor
             super().__init__([])
             App.__instance = self
-            self._panels = None
+            self._ui_manager = None
 
     @staticmethod
     def get_instance():
         """Get the application instance"""
         return App.__instance
+
+    @staticmethod
+    def get_window():
+        """Get the application window"""
+        if not App.__instance:
+            return None
+        return App.__instance._ui_manager
 
     @staticmethod
     def get_name():
@@ -56,40 +57,6 @@ class App(QtWidgets.QApplication):
     @staticmethod
     def get_icon():
         return None if not App.__instance else App.__instance.icon()
-
-    @staticmethod
-    def get_all_panels():
-        """Get all panels"""
-        return None if not App.__instance else App.__instance.all_panels()
-
-    @staticmethod
-    def get_panels():
-        """Get all name and panel pairs"""
-        return None if not App.__instance else App.__instance.panels()
-
-    @staticmethod
-    def get_panel(name):
-        """Get a panel by name"""
-        return None if not App.__instance else App.__instance.panel(name)
-
-    @staticmethod
-    def refresh_panel(name, **kwargs):
-        """Refresh a panel by name."""
-        instance = App.__instance
-        if instance is None:
-            return None
-        if name in App.PANELS:
-            try:
-                panel_ctor = getattr(ui, name)
-                panel_obj = panel_ctor(**kwargs)
-                instance._panels[panel_obj.get_name()] = panel_obj
-                return panel_obj
-            except Exception as e:
-                Logger.warning(f'MEG UI: {e}')
-                Logger.warning(f'MEG UI: Could not create panel "{name}"')
-        else:
-            Logger.warning(f'MEG UI: Panel does not exist')
-        return None
 
     @staticmethod
     def quit(exit_code=0):
@@ -107,32 +74,10 @@ class App(QtWidgets.QApplication):
     def icon(self):
         return pkg_resources.resource_filename(__name__, App.ICON_PATH)
 
-    def all_panels(self):
-        """Get all panels"""
-        panels = self.panels()
-        return [] if not panels else panels.values()
-
-    def panels(self):
-        """Get all name and panel pairs"""
-        if not self._panels:
-            self._panels = {}
-            for panel in App.PANELS:
-                try:
-                    panel_ctor = getattr(ui, panel)
-                    panel_obj = panel_ctor()
-                    self._panels[panel_obj.get_name()] = panel_obj
-                except Exception as e:
-                    Logger.warning(f'MEG UI: {e}')
-                    Logger.warning(f'MEG UI: Could not create panel "{panel}"')
-        return self._panels
-
-    def panel(self, name):
-        """Get a panel by name"""
-        panels = self.get_panels()
-        return None if not panels or name not in panels else panels[name]
-
     def on_start(self):
         """On application start"""
+        # Log information about version
+        Logger.info(f'MEG: {App.NAME} Version {App.VERSION}')
         # Log debug information about home directory
         Logger.debug(f'MEG: Home <{Config.get("path/home")}>')
         # Load configuration
@@ -163,10 +108,87 @@ class App(QtWidgets.QApplication):
             # On application start
             App.__instance.on_start()
             # Run the UI
-            ui.UIManager.setup(**kwargs)
+            ui_manager = ui.UIManager(**kwargs)
+            App.__instance._ui_manager = ui_manager
+            # Set the main panel to start
+            ui_manager.push_view(ui.MainPanel(), False)
+            # Show the window
+            ui_manager.show()
             # Launch application
             ret = App.__instance.exec_()
             # On application stop
             App.__instance.on_stop()
             # Exit the application
             App.__instance.exit(ret)
+
+    @staticmethod
+    def open_about():
+        """Open the about menu."""
+        desc = (f'<center><h3>{App.get_name()}</h3><p>Version {App.get_version()}</p></center>')
+        QtWidgets.QMessageBox.about(App.get_window(), f'About {App.get_name()}', desc)
+
+    @staticmethod
+    def open_manage_plugins():
+        """Open the manage plugins window."""
+        ui.UIManager.push_view(ui.PluginsPanel())
+
+    @staticmethod
+    def open_add_plugin():
+        """"Open the new plugin window"""
+        ui.UIManager.push_view(ui.AddPluginPanel())
+
+    @staticmethod
+    def clone(username, password, repo_url, repo_path):
+        """Clone a repository."""
+        # TODO: Handle username + password
+        # Set the config
+        repo = GitManager.clone(repo_url, repo_path)
+        if repo is not None:
+            repos = Config.get('path/repos', defaultValue=[])
+            repos.append({'url': repo_url, 'path': repo_path})
+            Config.set('path/repos', repos)
+            Config.save()
+            ui.UIManager.push_view(ui.RepoPanel(repo_url=repo_url, repo_path=repo_path, repo=repo))
+        else:
+            Logger.warning(f'MEG UIManager: Could not clone repo "{repo_url}"')
+            alert = QtWidgets.QMessageBox()
+            alert.setText(f'Could not clone the repo "{repo_url}"')
+            alert.exec_()
+
+    @staticmethod
+    def open_repo(repo_url, repo_path):
+        """Open a specific repo."""
+        # try:
+        repo = GitRepository(repo_path)
+        ui.UIManager.push_view(ui.RepoPanel(repo_url=repo_url, repo_path=repo_path, repo=repo))
+        # except Exception as e:
+        #     Logger.warning(f'MEG UIManager: {e}')
+        #     Logger.warning(f'MEG UIManager: Could not load repo in "{repo_path}"')
+        #     # Popup
+        #     alert = QtWidgets.QMessageBox()
+        #     alert.setText(f'Could not load the repo "{repo_path}"')
+        #     alert.exec_()
+
+    @staticmethod
+    def open_clone_panel():
+        """"Download" or clone a project."""
+        # TODO
+        ui.UIManager.push_view(ui.ClonePanel())
+
+    @staticmethod
+    def return_to_main():
+        """Return to the main panel"""
+        ui.UIManager.push_view(ui.MainPanel())
+
+    @staticmethod
+    def get_changes(repo):
+        """Get changes for the given repo (do a pull)."""
+        repo.pull()
+
+    @staticmethod
+    def send_changes(repo):
+        """Send changes for the given repo."""
+        # TODO
+        pass
+
+    # TODO: Add more menu opening/closing methods here

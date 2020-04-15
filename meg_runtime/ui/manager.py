@@ -5,7 +5,6 @@ import pkg_resources
 from PyQt5 import QtWidgets, QtGui, uic
 from meg_runtime.config import Config
 from meg_runtime.logger import Logger
-from meg_runtime.git import GitManager, GitRepository
 from meg_runtime.app import App
 
 
@@ -35,142 +34,69 @@ class UIManager(QtWidgets.QMainWindow):
             # Set handlers for main buttons
             # TODO: Add more handlers for these
             self._action_clone = self.findChild(QtWidgets.QAction, 'action_Clone')
-            self._action_clone.triggered.connect(UIManager.open_clone_panel)
+            self._action_clone.triggered.connect(App.open_clone_panel)
             self._action_open = self.findChild(QtWidgets.QAction, 'action_Open')
-            self._action_open.triggered.connect(UIManager.open_clone_panel)
+            self._action_open.triggered.connect(App.open_clone_panel)
             self._action_quit = self.findChild(QtWidgets.QAction, 'action_Quit')
             self._action_quit.triggered.connect(App.quit)
             self._action_about = self.findChild(QtWidgets.QAction, 'action_About')
-            self._action_about.triggered.connect(UIManager.open_about)
+            self._action_about.triggered.connect(App.open_about)
             self._action_manage_plugins = self.findChild(QtWidgets.QAction, 'action_Manage_Plugins')
-            self._action_manage_plugins.triggered.connect(UIManager.open_manage_plugins)
-            # Set the open repository
-            self._open_repo = None
-            self._current_panel = None
-            self.change_view(App.get_panel('MainPanel'))
+            self._action_manage_plugins.triggered.connect(App.open_manage_plugins)
+            # Set the default title
+            self._update_title()
             # Set the icon
             icon_path = App.get_icon()
             if icon_path is not None:
                 self.setWindowIcon(QtGui.QIcon(icon_path))
 
     @staticmethod
-    def get_instance(**kwargs):
-        """Get an instance of the singleton."""
-        if UIManager.__instance is None:
-            UIManager(**kwargs)
-        return UIManager.__instance
-
-    @staticmethod
-    def open_about():
-        """Open the about menu."""
-        instance = UIManager.get_instance()
-        desc = (f'<center><h3>{App.get_name()}</h3><p>Version {App.get_version()}</p></center>')
-        QtWidgets.QMessageBox.about(instance, f'About {App.get_name()}', desc)
-
-    @staticmethod
-    def open_manage_plugins():
-        """Open the manage plugins window."""
-        UIManager.change_view(App.refresh_panel('PluginsPanel'))
-
-    @staticmethod
-    def open_add_plugin():
-        """"Open the new plugin window"""
-        UIManager.change_view(App.refresh_panel('AddPluginPanel'))
-
-    @staticmethod
-    def clone(username, password, repo_url, repo_path):
-        """Clone a repository."""
-        # TODO: Handle username + password
-        # Set the config
-        repo = GitManager.clone(repo_url, repo_path)
-        if repo is not None:
-            repos = Config.get('path/repos', defaultValue=[])
-            repos.append({'url': repo_url, 'path': repo_path})
-            Config.set('path/repos', repos)
-            Config.save()
-            UIManager.change_view(App.refresh_panel('RepoPanel', repo_url=repo_url, repo_path=repo_path, repo=repo))
-        else:
-            Logger.warning(f'MEG UIManager: Could not clone repo "{repo_url}"')
-            alert = QtWidgets.QMessageBox()
-            alert.setText(f'Could not clone the repo "{repo_url}"')
-            alert.exec_()
-
-    @staticmethod
-    def open_repo(repo_url, repo_path):
-        """Open a specific repo."""
-        try:
-            repo = GitRepository(repo_path)
-            UIManager.change_view(App.refresh_panel('RepoPanel', repo_url=repo_url, repo_path=repo_path, repo=repo))
-        except Exception as e:
-            Logger.warning(f'MEG UIManager: {e}')
-            Logger.warning(f'MEG UIManager: Could not load repo in "{repo_path}"')
-            # Popup
-            alert = QtWidgets.QMessageBox()
-            alert.setText(f'Could not load the repo "{repo_path}"')
-            alert.exec_()
-
-    @staticmethod
-    def setup(**kwargs):
-        """Run initial setup of the UI manager."""
-        instance = UIManager.get_instance(**kwargs)
-        instance.show()
-
-    @staticmethod
-    def open_clone_panel():
-        """"Download" or clone a project."""
-        # TODO
-        UIManager.change_view(App.refresh_panel('ClonePanel'))
-
-    @staticmethod
-    def return_to_main():
-        """Return to the main panel"""
-        UIManager.change_view(App.refresh_panel('MainPanel'))
-
-    @staticmethod
-    def get_changes(repo):
-        """Get changes for the given repo (do a pull)."""
-        repo.pull()
-
-    @staticmethod
-    def send_changes(repo):
-        """Send changes for the given repo."""
-        # TODO
-        pass
-
-    @staticmethod
-    def change_view(panel):
-        """Change the current panel being viewed. """
-        instance = UIManager.get_instance()
-        if instance:
-            # Hide the current panel, if any
-            if instance._current_panel:
-                instance._current_panel.on_hide()
-            # Set the new window title, if provided by the panel
-            if panel and panel.get_title():
-                instance.setWindowTitle(f'{App.get_name()} - {panel.get_title()}')
-            else:
-                instance.setWindowTitle(f'{App.get_name()}')
+    def push_view(panel, closable=True):
+        """Push a panel onto the stack being viewed."""
+        if UIManager.__instance is not None:
+            # Hide the current panel
+            # if UIManager.__instance._current_panel:
+            #     UIManager.__instance._current_panel.on_hide()
+            # Show the current panel
+            # panel.on_show()
+            # Update the title for the panel
+            UIManager.__instance._update_title(panel)
             # Get the window central widget
-            container = instance.findChild(QtWidgets.QWidget, 'centralwidget')
+            container = UIManager.__instance.findChild(QtWidgets.QTabWidget, 'panelwidget')
             if container is not None:
-                # Get the widgets for the panel
-                widgets = None if not panel else panel.get_widgets()
-                # Get the window layout
-                layout = container.layout()
-                if layout is not None:
-                    # Remove all the previous panel widgets
-                    for i in reversed(range(layout.count())):
-                        layout.itemAt(i).widget().setParent(None)
-                    # Add the new panel widgets, if applicable
-                    if widgets:
-                        layout.addWidget(widgets)
-                # Set the new widgets, if applicable
-                if widgets:
-                    # Set the new parent of the container
-                    widgets.setParent(container)
-                    # Show the new panel
-                    panel.on_show()
-            # Set the new panel
-            instance._current_panel = panel
+                # Add the panel to the view stack
+                widgets = panel.get_widgets()
+                widgets.setParent(container)
+                title = panel.get_title()
+                index = container.addTab(widgets, 'Home' if not title else title)
+                # Remove the close button if not closable
+                if not closable:
+                    tabbar = container.tabBar()
+                    tabbar.tabButton(0, QtWidgets.QTabBar.RightSide).deleteLater()
+                    tabbar.setTabButton(0, QtWidgets.QTabBar.RightSide, None)
+                # Set the panel to the view
+                container.setCurrentIndex(index)
 
-    # TODO: Add more menu opening/closing methods here
+    @staticmethod
+    def pop_view():
+        """Push a panel onto the stack being viewed."""
+        if UIManager.__instance is not None:
+            # Hide the current panel
+            # if UIManager.__instance._current_panel:
+            #     UIManager.__instance._current_panel.on_hide()
+            # Show the current panel
+            # panel.on_show()
+            # Get the window central widget
+            container = UIManager.__instance.findChild(QtWidgets.QWidget, 'centralwidget')
+            if container:
+                # Remove the panel from the view stack
+                container.removeWidget(container.getCurrentIndex())
+            # UIManager.__instance._update_title(panel)
+
+    def _update_title(self, panel=None):
+        """Update the window title from the current panel"""
+        # Set the new window title, if provided by the panel
+        if panel is not None and panel.get_title():
+            self.setWindowTitle(f'{App.get_name()} - {panel.get_title()}')
+        else:
+            self.setWindowTitle(f'{App.get_name()}')

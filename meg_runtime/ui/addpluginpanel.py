@@ -80,7 +80,7 @@ class AddPluginPanel(BasePanel):
             if (self.selected_file is None):
                 return self.displayError('Please provide a plugin url to install')
             PluginManager.install_archive_from_url(url)
-        UIManager.open_manage_plugins()
+        App.open_manage_plugins()
 
     def enable_available_selection(self):
         """enable available plugin selection"""
