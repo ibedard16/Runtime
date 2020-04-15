@@ -410,5 +410,3 @@ class Config(dict):
         self['path']['plugins'] = os.path.join('$(path/home)', 'plugins') if 'MEG_PLUGINS_PATH' not in os.environ else os.environ['MEG_PLUGINS_PATH']
         # Get the plugin cache path from the environment, if present, otherwise use the default path
         self['path']['plugin_cache'] = os.path.join('$(path/home)', 'plugin_cache') if 'MEG_PLUGIN_CACHE_PATH' not in os.environ else os.environ['MEG_PLUGIN_CACHE_PATH']
-        # Get the permissions/roles path from the environment, if present, otherwise use the default path
-        self['path']['permissions'] = os.path.join('$(path/home)', 'permissions.json') if 'MEG_PERMISSIONS_PATH' not in os.environ else os.environ['MEG_PERMISSIONS_PATH']
