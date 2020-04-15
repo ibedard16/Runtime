@@ -65,21 +65,24 @@ class PluginsPanel(BasePanel):
         if selectedPlugin is not None:
             PluginManager.load_and_enable(selectedPlugin.name())
             Config.save()
-            self.refreshPluginList()
+            # self.refreshPluginList()
+            self.changeButtonStates()
 
     def disableCurrentPlugin(self):
         selectedPlugin = self.getCurrentPlugin()
         if selectedPlugin is not None:
             PluginManager.disable(selectedPlugin.name())
             Config.save()
-            self.refreshPluginList()
+            # self.refreshPluginList()
+            self.changeButtonStates()
 
     def uninstallCurrentPlugin(self):
         selectedPlugin = self.getCurrentPlugin()
         if selectedPlugin is not None:
             PluginManager.uninstall(selectedPlugin.name())
             Config.save()
-            self.refreshPluginList()
+            # self.refreshPluginList()
+            self.changeButtonStates()
 
     def getCurrentPlugin(self):
         selectedPluginItem = self.plugin_list.currentItem()

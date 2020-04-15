@@ -2,7 +2,10 @@
 from PyQt5 import QtWidgets
 from meg_runtime.app import App
 from meg_runtime.config import Config
+from meg_runtime.logger import Logger
+from meg_runtime.git import GitManager
 from meg_runtime.ui.basepanel import BasePanel
+from meg_runtime.ui.repopanel import RepoPanel
 from meg_runtime.ui.filechooser import FileChooser
 
 
@@ -14,15 +17,23 @@ class ClonePanel(BasePanel):
 
     def clone(self):
         """Clone the repository."""
+        # Setup repository
         repo_url = self.server_text_edit.toPlainText()
         username = self.username_text_edit.toPlainText()
         password = self.password_text_edit.toPlainText()
-        path = self._tree_view.get_selected_path()
-        repo_path = None
-        if path is not None:
-            repo_path = path
-        # Pass control to the manager
-        App.clone(username, password, repo_url, repo_path)
+        repo_path = self._tree_view.get_selected_path()
+        # TODO: Handle username + password
+        # Set the config
+        repo = GitManager.clone(repo_url, repo_path)
+        if repo is not None:
+            repos = Config.get('path/repos', defaultValue=[])
+            repos.append({'url': repo_url, 'path': repo_path})
+            Config.set('path/repos', repos)
+            Config.save()
+            App.get_window().push_view(RepoPanel(repo_url=repo_url, repo_path=repo_path, repo=repo))
+        else:
+            Logger.warning(f'MEG UIManager: Could not clone repo "{repo_url}"')
+            QtWidgets.QMessageBox.warning(App.get_window(), App.get_name(), f'Could not clone the repo "{repo_url}"')
 
     def get_title(self):
         """Get the title of this panel."""

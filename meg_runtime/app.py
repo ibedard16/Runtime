@@ -31,6 +31,7 @@ class App(QtWidgets.QApplication):
             super().__init__([])
             App.__instance = self
             self._ui_manager = None
+            self._main_panel = None
 
     @staticmethod
     def get_instance():
@@ -43,6 +44,13 @@ class App(QtWidgets.QApplication):
         if not App.__instance:
             return None
         return App.__instance._ui_manager
+
+    @staticmethod
+    def get_main_panel():
+        """Get the main application panel"""
+        if not App.__instance:
+            return None
+        return App.__instance._main_panel
 
     @staticmethod
     def get_name():
@@ -111,7 +119,9 @@ class App(QtWidgets.QApplication):
             ui_manager = ui.UIManager(**kwargs)
             App.__instance._ui_manager = ui_manager
             # Set the main panel to start
-            ui_manager.push_view(ui.MainPanel(), False)
+            App.__instance._main_panel = ui.MainPanel()
+            # Show the main panel
+            App.return_to_main()
             # Show the window
             ui_manager.show()
             # Launch application
@@ -130,65 +140,34 @@ class App(QtWidgets.QApplication):
     @staticmethod
     def open_manage_plugins():
         """Open the manage plugins window."""
-        ui.UIManager.push_view(ui.PluginsPanel())
+        App.get_window().push_view(ui.PluginsPanel())
 
     @staticmethod
     def open_add_plugin():
         """"Open the new plugin window"""
-        ui.UIManager.push_view(ui.AddPluginPanel())
-
-    @staticmethod
-    def clone(username, password, repo_url, repo_path):
-        """Clone a repository."""
-        # TODO: Handle username + password
-        # Set the config
-        repo = GitManager.clone(repo_url, repo_path)
-        if repo is not None:
-            repos = Config.get('path/repos', defaultValue=[])
-            repos.append({'url': repo_url, 'path': repo_path})
-            Config.set('path/repos', repos)
-            Config.save()
-            ui.UIManager.push_view(ui.RepoPanel(repo_url=repo_url, repo_path=repo_path, repo=repo))
-        else:
-            Logger.warning(f'MEG UIManager: Could not clone repo "{repo_url}"')
-            alert = QtWidgets.QMessageBox()
-            alert.setText(f'Could not clone the repo "{repo_url}"')
-            alert.exec_()
+        App.get_window().push_view(ui.AddPluginPanel())
 
     @staticmethod
     def open_repo(repo_url, repo_path):
         """Open a specific repo."""
-        # try:
-        repo = GitRepository(repo_path)
-        ui.UIManager.push_view(ui.RepoPanel(repo_url=repo_url, repo_path=repo_path, repo=repo))
-        # except Exception as e:
-        #     Logger.warning(f'MEG UIManager: {e}')
-        #     Logger.warning(f'MEG UIManager: Could not load repo in "{repo_path}"')
-        #     # Popup
-        #     alert = QtWidgets.QMessageBox()
-        #     alert.setText(f'Could not load the repo "{repo_path}"')
-        #     alert.exec_()
+        try:
+            repo = GitRepository(repo_path)
+            App.get_window().push_view(ui.RepoPanel(repo_url=repo_url, repo_path=repo_path, repo=repo))
+        except Exception as e:
+            Logger.warning(f'MEG UIManager: {e}')
+            Logger.warning(f'MEG UIManager: Could not load repo in "{repo_path}"')
+            # Popup
+            QtWidgets.QMessageBox.warning(App.get_window(), App.get_name(), f'Could not load the repo "{repo_path}"')
 
     @staticmethod
     def open_clone_panel():
         """"Download" or clone a project."""
         # TODO
-        ui.UIManager.push_view(ui.ClonePanel())
+        App.get_window().push_view(ui.ClonePanel())
 
     @staticmethod
     def return_to_main():
         """Return to the main panel"""
-        ui.UIManager.push_view(ui.MainPanel())
-
-    @staticmethod
-    def get_changes(repo):
-        """Get changes for the given repo (do a pull)."""
-        repo.pull()
-
-    @staticmethod
-    def send_changes(repo):
-        """Send changes for the given repo."""
-        # TODO
-        pass
+        App.get_window().set_view(App.get_main_panel(), False)
 
     # TODO: Add more menu opening/closing methods here
