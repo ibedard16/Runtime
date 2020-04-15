@@ -42,6 +42,9 @@
      <property name="itemsExpandable">
       <bool>false</bool>
      </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
      <property name="headerHidden">
       <bool>false</bool>
      </property>
@@ -79,55 +82,23 @@
        <string>Description</string>
       </property>
      </column>
-     <item>
-      <property name="text">
-       <string>🔵</string>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Plugin 1</string>
-      </property>
-      <property name="text">
-       <string>1.0.0</string>
-      </property>
-      <property name="text">
-       <string>John Doe</string>
-      </property>
-      <property name="text">
-       <string>A plugin that doesn't really exist</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>⚪</string>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Plugin 2</string>
-      </property>
-      <property name="text">
-       <string>0.1.0</string>
-      </property>
-      <property name="text">
-       <string>Jane Smith</string>
-      </property>
-      <property name="text">
-       <string>A plugin that exists, but not really</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item>
     <widget class="QWidget" name="horizontalWidget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QPushButton" name="enableButton">
         <property name="enabled">
