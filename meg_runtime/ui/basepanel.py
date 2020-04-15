@@ -16,9 +16,13 @@ class BasePanel(QtWidgets.QMainWindow):
         self._load_ui_file()
         self.on_load()
 
+    def get_class_widgets(self):
+        """Get the class widgets of this panel."""
+        return self.__widgets
+
     def get_widgets(self):
         """Get the widgets of this panel."""
-        return self.__widgets
+        return self.get_class_widgets()
 
     def get_name(self):
         """Get the name of this panel."""

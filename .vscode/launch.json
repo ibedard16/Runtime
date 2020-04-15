@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug",
+      "type": "python",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "program": "${workspaceFolder}/meg_runtime/__main__.py",
+      "console": "integratedTerminal",
+      "args": [
+        "-d"
+      ]
+    }
+  ]
+}
