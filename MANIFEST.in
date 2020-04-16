@@ -1,1 +1,2 @@
 include meg_runtime/ui/*.ui
+include meg_runtime/ui/images/*.svg
