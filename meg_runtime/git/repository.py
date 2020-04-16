@@ -33,7 +33,7 @@ class GitRepository(Repository):
             # Clone a repository
             self.__dict__ = clone_repository(url, path, bare=bare, checkout_branch=checkout_branch).__dict__
         self.permissions = Permissions()
-        self.locking = Locking()
+        self.locking = Locking(self)
         # Initialize the git repository super class
         super().__init__(path, *args, **kwargs)
 
@@ -56,7 +56,7 @@ class GitRepository(Repository):
     def pullPermissions(self, username):
         """Pull down current version of permissions file
         """
-        if not self.pullPath([Permissions.PERMISSION_FILE]):
+        if not self.pullPath([Permissions.PERMISSION_PATH]):
             Logger.warning("MEG repository: Failed to download permission file")
         self.permissions = Permissions()
 
@@ -66,7 +66,7 @@ class GitRepository(Repository):
         # Store permissions in file
         self.permissions.save()
         # stage permissions file
-        self.index.add(Permissions.PERMISSION_FILE)
+        self.index.add(Permissions.PERMISSION_PATH)
         self.index.write()
         # Commit and push
         self.commit_push(self.index.write_tree(), "MEG PERMISSIONS UPDATE")
@@ -106,7 +106,7 @@ class GitRepository(Repository):
         Logger.warning(f'MEG Repositiory: Could not checkout paths')
         return False
 
-    def pull(self, remote_name='origin', fail_on_conflict=False):
+    def pull(self, remote_name='origin', fail_on_conflict=False, username=Config.get('user/username'), password=Config.get('user/password')):
         """Pull and merge
         Merge is done fully automaticly, currently uses 'ours' on conflicts
         TODO: Preform a proper merge with the locking used to resolve conflicts
@@ -116,17 +116,13 @@ class GitRepository(Repository):
             remote_ref_name (string): name of reference to the remote being pulled from
         """
         self.fetch_all()
-        # Branches are not handled very elegently in pygit2s
-        headBranch = None
-        for branch in pygit2.repository.Branches(self):
-            if pygit2.repository.Branches(self)[branch].is_head():
-                headBranch = pygit2.repository.Branches(self)[branch]
+        self.permissions.save()
         # Find and stage changes that are allowd by locking system
-        if self.isChanged():
-            self.stageChanges()
+        if self.isChanged(username):
+            self.stageChanges(username)
             self.create_commit('HEAD', self.default_signature, self.default_signature, "MEG PULL OWN", self.index.write_tree(), [self.head.target])
         # Prepare for a merge
-        remoteId = self.lookup_reference(headBranch.upstream_name).target
+        remoteId = self.lookup_reference("FETCH_HEAD").target
         mergeState, _ = self.merge_analysis(remoteId)
         if mergeState & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD:
             # Fastforward and checkout remote
@@ -135,20 +131,64 @@ class GitRepository(Repository):
             self.checkout_head()
         elif mergeState & pygit2.GIT_MERGE_ANALYSIS_NORMAL:
             # Preform merge
-            '''TODO: Preform a proper merge with the locking
-            self.merge(remoteId)
-            #conflit (IndexEntry(ancester, ours, theirs))
-            for conflit in self.index.conflicts:'''
             if fail_on_conflict:
                 self.state_cleanup()
                 return False
-            self.merge_commits(self.head.peel(), self.lookup_reference(headBranch.upstream_name).peel(), favor='ours')
-            # Commit the merge
-            self.create_commit('HEAD', self.default_signature, self.default_signature, "MEG MERGE", self.index.write_tree(), [self.head.target, remoteId])
+            self.preformMerge(remoteId, username)
         self.state_cleanup()
+        self.permissions = Permissions()
         return True
 
-    def push(self, remote_name='origin', username=None, password=None):
+    def preformMerge(self, remoteId, username=Config.get('user/username')):
+        """Merge and commit
+        """
+        # Merge will stage changes automaticly and find conflicts
+        self.merge(remoteId)
+        for conflict in self.index.conflicts:
+            path = self.pathFromConflict(conflict)
+            if not self.permissions.can_write(username, conflict[0].path):
+                # Not allowed to write, use theirs
+                self.stageConflictChange(conflict[2], path)
+            elif not self.locking.findLock(path) is None:
+                if self.locking.findLock(path)["user"] != username:
+                    # Is locked by not the local user, use theirs
+                    self.stageConflictChange(conflict[2], path)
+                else:
+                    # Else its our lock
+                    self.stageConflictChange(conflict[1], path)
+            elif path == Locking.LOCKFILE_PATH:
+                oldLocks = None if conflict[0] is None else Locking(self, conflict[0].data)
+                remoteLocks = None if conflict[1] is None else Locking(self, conflict[1].data)
+                self.locking.merge(oldLocks, remoteLocks)
+                del self.index.conflicts[path]
+                self.index.add(path)
+            elif path == Permissions.PERMISSION_PATH:
+                # For conflicting Permissions that have been changed on remote, it is safest to discard local version and accept the remote
+                self.stageConflictChange(conflict[2], path)
+            else:
+                # TODO: Some other merge logic from plugins and other stuff
+                # Currently just use ours
+                if not conflict[1] is None:
+                    self.index.add(conflict[1])
+                else:
+                    self.index.remove(path)
+                del self.index.conflicts[path]
+        # Commit the merge
+        self.create_commit('HEAD', self.default_signature, self.default_signature, "MEG MERGE", self.index.write_tree(), [self.head.target, remoteId])
+
+        def stageConflictChange(self, indexEntry, path):
+            if indexEntry is not None:
+                self.index.add(indexEntry)
+            else:
+                self.index.remove(path)
+            del self.index.conflicts[path]
+
+    def pathFromConflict(self, indexConflict):
+        """Returns path of conflict from index.conflicts entry
+        """
+        return [conf.path for conf in indexConflict if conf is not None][0]
+
+    def push(self, remote_name='origin', username=Config.get('user/username'), password=Config.get('user/password')):
         """Pushes current commits
         4/13/20 21 - seems to be working
 
@@ -157,10 +197,6 @@ class GitRepository(Repository):
             username (string, optional): username of user account used for pushing
             password (string, optional): password of user account used for pushing
         """
-        if username is None:
-            username = Config.get('user/username')
-        if password is None:
-            password = Config.get('user/password')
         creds = pygit2.UserPass(username, password)
         remote = self.remotes[remote_name]
         remote.credentials = creds
@@ -196,12 +232,12 @@ class GitRepository(Repository):
                 return True
         return False
 
-    def sync(self, remote_name='origin', username=None, password=None):
+    def sync(self, remote_name='origin', username=Config.get('user/username'), password=Config.get('user/password')):
         """Pulls and then pushes, merge conflicts resolved by pull
 
         Args:
             username (string, optional): username of user account used for pushing
             password (string, optional): password of user account used for pushing
         """
-        self.pull(remote_name)
-        self.push(remote_name, username=None, password=None)
+        self.pull(remote_name, username=username, password=password)
+        self.push(remote_name, username=username, password=password)

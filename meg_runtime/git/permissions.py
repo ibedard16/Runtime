@@ -11,7 +11,7 @@ from meg_runtime.logger import Logger
 class Permissions(dict):
     """Permissions manager - one for each repository"""
 
-    PERMISSION_FILE = ".meg/permissions.json"
+    PERMISSION_PATH = ".meg/permissions.json"
 
     def __init__(self):
         """Load the repository permission file"""
@@ -35,11 +35,11 @@ class Permissions(dict):
             }
         })
         try:
-            self.update(json.load(open(Permissions.PERMISSION_FILE)))
+            self.update(json.load(open(Permissions.PERMISSION_PATH)))
         except FileNotFoundError as e:
             # Log that loading the configuration failed
             Logger.warning('MEG Permission: {0}'.format(e))
-            Logger.warning('MEG Permission: Could not load permissions file <' + Permissions.PERMISSION_FILE + '>, using default permissions')
+            Logger.warning('MEG Permission: Could not load permissions file <' + Permissions.PERMISSION_PATH + '>, using default permissions')
 
     def get_users(self):
         """Returns a list of all users and their roles
@@ -118,9 +118,9 @@ class Permissions(dict):
 
     def save(self):
         """Save currenly held permissions / roles to file"""
-        if not os.path.exists(Permissions.PERMISSION_FILE):
-            os.makedirs(os.path.dirname(Permissions.PERMISSION_FILE), exist_ok=True)
-        json.dump(self, open(Permissions.PERMISSION_FILE, 'w+'))
+        if not os.path.exists(Permissions.PERMISSION_PATH):
+            os.makedirs(os.path.dirname(Permissions.PERMISSION_PATH), exist_ok=True)
+        json.dump(self, open(Permissions.PERMISSION_PATH, 'w+'))
 
     def _get_roles(self, user):
         """Get a list of users from the configuration file."""
