@@ -14,6 +14,10 @@ class MainPanel(BasePanel):
         """MainPanel constructor."""
         super().__init__(**kwargs)
 
+    def get_is_closable(self):
+        """Get if the panel is closable."""
+        return False
+
     def on_load(self):
         """Load dynamic elements within the panel."""
         instance = self.get_widgets()
