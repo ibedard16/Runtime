@@ -18,7 +18,7 @@ class RepoPanel(BasePanel):
         self._repo_path = repo_path
         self._repo = repo
         super().__init__(**kwargs)
-        self._branch_name_label.text = self.title
+        self._branch_name_label.setText(self.title)
 
     def handle_double_clicked(self, item):
         """Handle double clicking of a file (open it with another program)."""

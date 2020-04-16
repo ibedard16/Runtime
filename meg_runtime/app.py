@@ -174,6 +174,6 @@ class App(QtWidgets.QApplication):
     @staticmethod
     def return_to_main():
         """Return to the main panel"""
-        App.get_window().set_view(App.get_main_panel(), False)
+        App.get_window().set_view(App.get_main_panel())
 
     # TODO: Add more menu opening/closing methods here

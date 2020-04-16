@@ -46,6 +46,10 @@ class BasePanel(QtWidgets.QMainWindow):
         """Get the title of this panel."""
         return ''
 
+    def get_is_closable(self):
+        """Get if the panel is closable."""
+        return True
+
     def on_load(self):
         """Load dynamic elements within the panel."""
         pass
