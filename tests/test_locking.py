@@ -17,7 +17,7 @@ def generateLocking():
 
 
 def test_findLock(generateLocking):
-    locking = Locking()
+    locking = Locking(generateLocking[1])
     entry = locking.findLock("project/jeffs2ndPart.dwg")
     assert entry["user"] == "bob"
     entry = locking.findLock("project/jeffsPart.dwg")
@@ -26,17 +26,17 @@ def test_findLock(generateLocking):
 
 
 def test_addLock(generateLocking):
-    locking = Locking()
-    assert not locking.addLock(generateLocking[1], "project/jeffs2ndPart.dwg", "bob")  # Lock belonging to user else already exists
-    assert not locking.addLock(generateLocking[1], "project/jeffsPart.dwg", "bob")  # Lock belonging to someone else already exists
-    assert locking.addLock(generateLocking[1], "morethings/aThing.svg", "bob")
+    locking = Locking(generateLocking[1])
+    assert not locking.addLock("project/jeffs2ndPart.dwg", "bob")  # Lock belonging to user else already exists
+    assert not locking.addLock("project/jeffsPart.dwg", "bob")  # Lock belonging to someone else already exists
+    assert locking.addLock("morethings/aThing.svg", "bob")
     assert locking.findLock("morethings/aThing.svg")["user"] == "bob"
 
 
 def test_removeLock(generateLocking):
-    locking = Locking()
+    locking = Locking(generateLocking[1])
     generateLocking[1].permissions = mock.MagicMock()
     generateLocking[1].permissions.can_remove_lock.return_value = False
-    assert not locking.removeLock(generateLocking[1], "project/jeffsPart.dwg", "bob")  # Lock belonging to someone else
-    assert locking.removeLock(generateLocking[1], "src/other.txt", "bob")
+    assert not locking.removeLock("project/jeffsPart.dwg", "bob")  # Lock belonging to someone else
+    assert locking.removeLock("src/other.txt", "bob")
     assert len(locking.locks()) == generateLocking[0] - 1

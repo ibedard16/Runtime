@@ -9,26 +9,26 @@ from meg_runtime.git.permissions import Permissions
 def change_to_test_directory():
     cd = os.getcwd()
     os.chdir(os.path.dirname(__file__))
-    defaultPermFile = Permissions.PERMISSION_FILE
+    defaultPermFile = Permissions.PERMISSION_PATH
     yield
-    Permissions.PERMISSION_FILE = defaultPermFile
+    Permissions.PERMISSION_PATH = defaultPermFile
     os.chdir(cd)
 
 
 def test_permissions_00(change_to_test_directory):
-    Permissions.PERMISSION_FILE = 'test_permissions_00.json'
+    Permissions.PERMISSION_PATH = 'test_permissions_00.json'
     Permissions()
 
 
 def test_permissions_01(change_to_test_directory):
-    Permissions.PERMISSION_FILE = 'test_permissions_01.json'
+    Permissions.PERMISSION_PATH = 'test_permissions_01.json'
     perms = Permissions()
 
     assert not perms.can_write('user2', 'a')
 
 
 def test_permissions_02(change_to_test_directory):
-    Permissions.PERMISSION_FILE = 'test_permissions_01.json'
+    Permissions.PERMISSION_PATH = 'test_permissions_01.json'
     perms = Permissions()
 
     assert perms.can_write('user1', 'a')

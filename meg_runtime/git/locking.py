@@ -8,7 +8,6 @@ Working directory should be changed by the git module
 """
 
 from meg_runtime.git.lockFile import LockFile
-from meg_runtime.logger import Logger
 
 
 class Locking:
@@ -17,11 +16,12 @@ class Locking:
     """
     LOCKFILE_PATH = ".meg/locks.json"
 
-    def __init__(self):
-        Locking._lockFile = LockFile(Locking.LOCKFILE_PATH)
+    def __init__(self, repo, blob=None):
+        self._lockFile = LockFile(Locking.LOCKFILE_PATH, blob=blob)
+        self._repo = repo
 
-    def addLock(self, repo, filepath, username):
-        """Sync the repo, adds the lock, sync the repo
+    def addLock(self, filepath, username):
+        """Adds the lock
         Args:
             repo (GitRepository): currently open repository that the file belongs to
             filepath (string): path to the file to lock
@@ -29,17 +29,15 @@ class Locking:
         Returns:
             (bool): was lock successfully added
         """
-        if not repo.permissions.can_lock(username):
+        if not self._repo.permissions.can_lock(username):
             return False
-        self.pullLocks(repo)
         if filepath in self._lockFile:
             return False
         else:
             self._lockFile[filepath] = username
-            self.pushLocks(repo)
             return True
 
-    def removeLock(self, repo, filepath, username):
+    def removeLock(self, filepath, username):
         """Sync the repo, remove a lock from a file, and sync again
         Args:
             repo (GitRepository): currently open repository that the file belongs to
@@ -48,15 +46,13 @@ class Locking:
         Returns:
             (bool): is there still a lock (was the user permitted to remove the lock)
         """
-        self.pullLocks(repo)
         lock = self._lockFile[filepath]
         if(lock is None):
             return True
-        elif(lock["user"] == username or repo.permissions.can_remove_lock(username)):
+        elif(lock["user"] == username or self._repo.permissions.can_remove_lock(username)):
             del self._lockFile[filepath]
         else:
             return False
-        self.pushLocks(repo)
         return True
 
     def findLock(self, filepath):
@@ -67,42 +63,45 @@ class Locking:
             (dictionary): lockfile entry for the file
             (None): There is no entry
         """
-        self._lockFile.load()
         return self._lockFile[filepath]
 
     def locks(self):
         """Get the LockFile object
         """
-        self._lockFile.load()
         return self._lockFile
 
-    def pullLocks(self, repo):
-        """Pulls the lock file from remote and loads it
-
-        Args:
-            repo(GitRepository): currently open repository that the file belongs to
+    def save(self):
+        """Save current locks to the local lockfile
         """
-        if repo is None:
-            Logger.warning("MEG Locking: Could not open repositiory")
-            return False
-        # Fetch current version
-        if not repo.pullPaths([Locking.LOCKFILE_PATH]):
-            Logger.warning("MEG Locking: Could not download newest lockfile")
-
-        self._lockFile.load()
-
-    def pushLocks(self, repo):
-        """Saves the lock settigs to the remote repository
-
-        Args:
-            repo(GitRepository): currently open repository that the file belongs to
-        """
-        # Save current lockfile
         self._lockFile.save()
-        # Stage lockfile changes
-        # Must be relitive to worktree root
-        repo.index.add(Locking.LOCKFILE_PATH)
-        repo.index.write()
-        tree = repo.index.write_tree()
-        # Commit and push
-        repo.commit_push(tree, "MEG LOCKFILE UPDATE")
+
+    def merge(self, oldLocalLocks, remoteLocks):
+        # Get all unique paths
+        keys = []
+        if oldLocalLocks is not None:
+            keys += oldLocalLocks._lockFile.keys()
+        if remoteLocks is not None:
+            keys += remoteLocks._lockFile.keys()
+        keys = set(keys)
+        for key in keys:
+            isOld = False if oldLocalLocks is None else key in oldLocalLocks._lockFile
+            isLocal = key in self._lockFile
+            isRemote = False if remoteLocks is None else key in remoteLocks._lockFile
+            if isLocal and isRemote:
+                # If lock is defined in both, use the older one
+                self._lockFile[key] = self._lockFile[key] if self._lockFile[key] < remoteLocks._lockFile[key] else remoteLocks._lockFile[key]
+            elif isOld and isLocal:
+                # If lock defined in both common old and local, but not remote
+                if oldLocalLocks._lockFile[key] == self._lockFile[key]:
+                    # If the local one hasn't changed, delete
+                    del self._lockFile[key]
+            elif isOld and isRemote:
+                # If lock defined in both common old and remote, but not local
+                if oldLocalLocks._lockFile[key] != remoteLocks._lockFile[key]:
+                    # If the remote one has changed, add it
+                    self._lockFile[key] = remoteLocks._lockFile[key]
+            elif isRemote:
+                # If the lock is on remote, but not any other, add it
+                self._lockFile[key] = remoteLocks._lockFile[key]
+            # If the lock is only on local then it is still here
+        self.save()
