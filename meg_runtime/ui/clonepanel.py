@@ -30,7 +30,7 @@ class ClonePanel(BasePanel):
             repos.append({'url': repo_url, 'path': repo_path})
             Config.set('repos', repos)
             Config.save()
-            App.get_window().push_view(RepoPanel(repo=repo))
+            App.get_window().push_view(RepoPanel(repo))
         else:
             Logger.warning(f'MEG UIManager: Could not clone repo "{repo_url}"')
             QtWidgets.QMessageBox.warning(App.get_window(), App.get_name(), f'Could not clone the repo "{repo_url}"')
