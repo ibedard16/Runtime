@@ -6,7 +6,7 @@ All users always have the default role. All permissions can be removed from the 
 import json
 import os
 from meg_runtime.logger import Logger
-
+from meg_runtime.git.role import Role
 
 class Permissions(dict):
     """Permissions manager - one for each repository"""
@@ -48,6 +48,24 @@ class Permissions(dict):
             (list((username, list(roles)))): List of truples containing usernames and a list of their roles
         """
         pass
+
+    def get_roles(self):
+        """Returns a list of all roles and their permissions"""
+        rolesList = {}
+        self._construct_roles_from_permission(rolesList, 'roles_remove_locks')
+        self._construct_roles_from_permission(rolesList, 'roles_add_locks')
+        self._construct_roles_from_permission(rolesList, 'roles_write')
+        self._construct_roles_from_permission(rolesList, 'roles_grant')
+        self._construct_roles_from_permission(rolesList, 'roles_modify_roles')
+        return rolesList
+    
+    def _construct_roles_from_permission(self, rolesList, permissionName):
+        """Adds any roles present in the permissionName to the rolesList"""
+        for roleName in self['general'][permissionName]:
+            if (rolesList[roleName] is not None):
+                rolesList[roleName].give_role(permissionName)
+            else:
+                rolesList[roleName] = Role(roleName, [permissionName])
 
     def can_lock(self, user):
         """Return True if the current user can lock a specific path"""
