@@ -26,11 +26,11 @@ class ClonePanel(BasePanel):
         # Set the config
         repo = GitManager.clone(repo_url, repo_path)
         if repo is not None:
-            repos = Config.get('path/repos', defaultValue=[])
+            repos = Config.get('repos', defaultValue=[])
             repos.append({'url': repo_url, 'path': repo_path})
-            Config.set('path/repos', repos)
+            Config.set('repos', repos)
             Config.save()
-            App.get_window().push_view(RepoPanel(repo_url=repo_url, repo_path=repo_path, repo=repo))
+            App.get_window().push_view(RepoPanel(repo=repo))
         else:
             Logger.warning(f'MEG UIManager: Could not clone repo "{repo_url}"')
             QtWidgets.QMessageBox.warning(App.get_window(), App.get_name(), f'Could not clone the repo "{repo_url}"')
