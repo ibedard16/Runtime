@@ -22,15 +22,14 @@ class MainPanel(BasePanel):
 
     def on_load(self):
         """Load dynamic elements within the panel."""
-        instance = self.get_widgets()
-        self.download_button = instance.findChild(QtWidgets.QPushButton, 'downloadButton')
-        # TODO: Attach handlers
-        self.download_button.clicked.connect(App.open_clone_panel)
-        self._tree_widget = instance.findChild(QtWidgets.QTreeWidget, 'treeWidget')
+        self._tree_widget = self.get_widgets().findChild(QtWidgets.QTreeWidget, 'treeWidget')
         self._tree_widget.itemDoubleClicked.connect(self._handle_double_click)
+
+    def on_show(self):
+        """Showing the panel."""
         # Load the repos
         # TODO: Get this from the GitManager
-        repos = Config.get('path/repos')
+        repos = Config.get('repos')
         repos = [
             QtWidgets.QTreeWidgetItem([
                 os.path.basename(repo['path']),
@@ -44,14 +43,14 @@ class MainPanel(BasePanel):
 
     def _handle_double_click(self, item):
         """Handle a double click."""
-        repo_path = 'unknown'
+        repo_path = None
         try:
             repo_path = item.text(1)
             repo_url = item.text(2)
             # Open or clone the repo
             repo = GitManager.open_or_clone(repo_path, repo_url)
             # Create the repository panel
-            App.get_window().push_view(RepoPanel(repo, repo_url))
+            App.get_window().push_view(RepoPanel(repo))
         except Exception as e:
             Logger.warning(f'MEG UIManager: {e}')
             Logger.warning(f'MEG UIManager: Could not load repository "{repo_path}"')

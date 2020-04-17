@@ -206,5 +206,4 @@ class UIManager(QtWidgets.QMainWindow):
                 current_panel.on_hide()
             # Show the new panel
             if panel is not None:
-                Logger.debug(f'MEG UI: Showing panel "{panel.get_name()}"')
                 panel.on_show()

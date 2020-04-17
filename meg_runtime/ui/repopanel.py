@@ -12,10 +12,9 @@ from meg_runtime.ui.filechooser import FileChooser
 class RepoPanel(BasePanel):
     """Setup the main file panel."""
 
-    def __init__(self, repo, repo_url=None, **kwargs):
+    def __init__(self, repo, **kwargs):
         """RepoPanel constructor."""
         self._repo = repo
-        self._repo_url = repo_url
         super().__init__(**kwargs)
 
     def get_title(self):
