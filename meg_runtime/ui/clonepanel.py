@@ -26,14 +26,24 @@ class ClonePanel(BasePanel):
         # Set the config
         repo = GitManager.clone(repo_url, repo_path)
         if repo is not None:
-            repos = Config.get('repos', defaultValue=[])
-            repos.append({'url': repo_url, 'path': repo_path})
-            Config.set('repos', repos)
-            Config.save()
+            self._save_repo_entry_in_config(repo_url, repo_path)
             App.get_window().push_view(RepoPanel(repo))
         else:
             Logger.warning(f'MEG UIManager: Could not clone repo "{repo_url}"')
             QtWidgets.QMessageBox.warning(App.get_window(), App.get_name(), f'Could not clone the repo "{repo_url}"')
+    
+    def _save_repo_entry_in_config(self, repo_url, repo_path):
+        repos = Config.get('repos', defaultValue=[])
+        duplicate_found  = False
+        for index, repo in enumerate(repos):
+            if repo['path'] == repo_path:
+                repos[index]['url'] = repo_url
+                duplicate_found = True
+                break
+        if not duplicate_found:
+            repos.append({'url': repo_url, 'path': repo_path})
+        Config.set('repos', repos)
+        Config.save()
 
     def get_title(self):
         """Get the title of this panel."""
