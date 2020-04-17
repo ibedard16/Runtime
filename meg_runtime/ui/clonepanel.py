@@ -1,4 +1,5 @@
 
+import pkg_resources
 from PyQt5 import QtWidgets
 from meg_runtime.app import App
 from meg_runtime.config import Config

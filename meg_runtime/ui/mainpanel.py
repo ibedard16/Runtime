@@ -12,7 +12,7 @@ class MainPanel(BasePanel):
 
     def __init__(self, **kwargs):
         """MainPanel constructor."""
-        super().__init__(**kwargs)
+        super().__init__(App.get_icon(), **kwargs)
 
     def get_is_closable(self):
         """Get if the panel is closable."""

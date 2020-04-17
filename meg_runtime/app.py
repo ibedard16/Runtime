@@ -2,7 +2,7 @@
 """
 
 import pkg_resources
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from meg_runtime.config import Config
 from meg_runtime.logger import Logger
 from meg_runtime.git import GitManager, GitRepository
@@ -16,7 +16,7 @@ class App(QtWidgets.QApplication):
 
     NAME = 'Multimedia Extensible Git'
     VERSION = '0.1'
-    ICON_PATH = 'meg.ico'
+    ICON_PATH = 'ui/images/git.svg'
 
     __instance = None
 
@@ -134,7 +134,11 @@ class App(QtWidgets.QApplication):
     @staticmethod
     def open_about():
         """Open the about menu."""
-        desc = (f'<center><h3>{App.get_name()}</h3><p>Version {App.get_version()}</p></center>')
+        desc = (f'<p><b>{App.get_name()}</b><br/>'
+                f'Version {App.get_version()}<br/><br/>'
+                f'Qt Version {QtCore.QT_VERSION_STR}<br/>'
+                f'PyQt Version {QtCore.PYQT_VERSION_STR}<br/>'
+                f'Font Awesome Version 5.13.0</p>')
         QtWidgets.QMessageBox.about(App.get_window(), f'About {App.get_name()}', desc)
 
     @staticmethod

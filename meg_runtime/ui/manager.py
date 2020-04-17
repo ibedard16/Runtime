@@ -11,7 +11,7 @@ from meg_runtime.app import App
 class UIManager(QtWidgets.QMainWindow):
     """Main UI manager for the MEG system."""
 
-    DEFAULT_UI_FILE = 'mainwindow.ui'
+    UI_FILE = 'mainwindow.ui'
 
     # The window class widgets
     __widgets = None
@@ -21,7 +21,7 @@ class UIManager(QtWidgets.QMainWindow):
         # Load window resource if needed
         if UIManager.__widgets is None:
             # Load the resource setup from the package
-            UIManager.__widgets = uic.loadUiType(pkg_resources.resource_filename(__name__, UIManager.DEFAULT_UI_FILE))
+            UIManager.__widgets = uic.loadUiType(pkg_resources.resource_filename(__name__, UIManager.UI_FILE))
         # Initialize the super class
         super().__init__(**kwargs)
         # Setup window resource
@@ -31,6 +31,7 @@ class UIManager(QtWidgets.QMainWindow):
         # Set handler for closing a panel
         self._panelwidget = self.findChild(QtWidgets.QTabWidget, 'panelwidget')
         self._panelwidget.tabCloseRequested.connect(self.remove_view_by_index)
+        self._panelwidget.tabBarClicked.connect(self._show_view_by_index)
         # Set handlers for main buttons
         # TODO: Add more handlers for these
         self._action_clone = self.findChild(QtWidgets.QAction, 'action_Clone')
@@ -49,6 +50,14 @@ class UIManager(QtWidgets.QMainWindow):
         icon_path = App.get_icon()
         if icon_path is not None:
             self.setWindowIcon(QtGui.QIcon(icon_path))
+
+    def set_title(self, panel=None):
+        """Update the window title from the current panel"""
+        # Set the new window title, if provided by the panel
+        if panel is not None and panel.get_title():
+            self.setWindowTitle(f'{App.get_name()} - {panel.get_title()}')
+        else:
+            self.setWindowTitle(f'{App.get_name()}')
 
     def get_panel_container(self):
         """Get the panel container widget"""
@@ -110,10 +119,12 @@ class UIManager(QtWidgets.QMainWindow):
             title = panel.get_title()
             index = container.addTab(widgets, 'Home' if not title else title)
             # Remove the close button if not closable
+            tabbar = container.tabBar()
             if not panel.get_is_closable():
-                tabbar = container.tabBar()
                 tabbar.tabButton(index, QtWidgets.QTabBar.RightSide).deleteLater()
                 tabbar.setTabButton(index, QtWidgets.QTabBar.RightSide, None)
+            # Add the panel icon
+            tabbar.setTabIcon(index, panel.get_icon())
             # Set the panel to the view
             container.setCurrentIndex(index)
             # Add the panel to the panel stack
@@ -183,10 +194,18 @@ class UIManager(QtWidgets.QMainWindow):
             # Remove the panel
             self.remove_view(panel)
 
-    def set_title(self, panel=None):
-        """Update the window title from the current panel"""
-        # Set the new window title, if provided by the panel
-        if panel is not None and panel.get_title():
-            self.setWindowTitle(f'{App.get_name()} - {panel.get_title()}')
-        else:
-            self.setWindowTitle(f'{App.get_name()}')
+    def _show_view_by_index(self, index):
+        """Show the panel on click"""
+        # Get the panel by index
+        panel = self.get_panel_by_index(index)
+        # Get the current panel
+        current_panel = self.get_current_panel()
+        # Check if the panel is not the current panel
+        if current_panel != panel:
+            # Hide the current panel
+            if current_panel is not None:
+                current_panel.on_hide()
+            # Show the new panel
+            if panel is not None:
+                Logger.debug(f'MEG UI: Showing panel "{panel.get_name()}"')
+                panel.on_show()
