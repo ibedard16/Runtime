@@ -46,6 +46,12 @@ class GitRepository(Repository):
     def permissions(self):
         return self.__permissions
 
+    @property
+    def path(self):
+        if not self.is_empty:
+            return self.workdir
+        return super().path
+
     # Git repository destructor
     def __del__(self):
         # Free the repository references

@@ -12,27 +12,15 @@ from meg_runtime.ui.filechooser import FileChooser
 class RepoPanel(BasePanel):
     """Setup the main file panel."""
 
-    def __init__(self, repo_url=None, repo_path=None, repo=None, **kwargs):
+    def __init__(self, repo, repo_url=None, **kwargs):
         """RepoPanel constructor."""
-        self._repo_url = repo_url
-        self._repo_path = repo_path
         self._repo = repo
+        self._repo_url = repo_url
         super().__init__(**kwargs)
-        self._branch_name_label.text = self.title
-
-    def handle_double_clicked(self, item):
-        """Handle double clicking of a file (open it with another program)."""
-        # TODO
-        path = self.tree_view.get_selected_path()
-
-    @property
-    def title(self):
-        """Get the title for the panel."""
-        return os.path.basename(self._repo_path) if self._repo_path else 'Project'
 
     def get_title(self):
         """Get the title of this panel."""
-        return self.title
+        return os.path.basename(os.path.abspath(self._repo.path))
 
     def get_changes(self):
         """Do a pull for the repository."""
@@ -55,12 +43,19 @@ class RepoPanel(BasePanel):
         self._send_changes_button.clicked.connect(self.send_changes)
         self._branch_name_label = instance.findChild(QtWidgets.QLabel, 'branchName')
         # Setup the tree view of the repo if the repo folder exists
-        path = Config.get('paths/user')
-        if self._repo_path is not None:
-            if os.path.exists(self._repo_path):
-                path = self._repo_path
-            else:
-                Logger.warning(f'MEG RepoPanel: The path "{self._repo_path}" for this repo does not exist')
-        self.tree_view = FileChooser(instance.findChild(QtWidgets.QTreeView, 'treeView'), path)
-        # Setup a double click function if necessary
-        self.tree_view.set_double_click_handler(self.handle_double_clicked)
+        if os.path.exists(self._repo.path):
+            path = self._repo.path
+            self.tree_view = FileChooser(instance.findChild(QtWidgets.QTreeView, 'treeView'), path)
+            # Setup a double click function if necessary
+            self.tree_view.set_double_click_handler(self._handle_double_clicked)
+        else:
+            Logger.warning(f'MEG RepoPanel: The path "{self._repo.path}" for this repo does not exist')
+
+    def on_show(self):
+        """Showing the panel."""
+        self._branch_name_label.setText(self._repo.head.shorthand)
+
+    def _handle_double_clicked(self, item):
+        """Handle double clicking of a file (open it with another program)."""
+        # TODO
+        path = self.tree_view.get_selected_path()

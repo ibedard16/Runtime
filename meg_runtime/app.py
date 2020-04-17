@@ -5,7 +5,6 @@ import pkg_resources
 from PyQt5 import QtCore, QtWidgets
 from meg_runtime.config import Config
 from meg_runtime.logger import Logger
-from meg_runtime.git import GitManager, GitRepository
 from meg_runtime.plugins import PluginManager
 from meg_runtime import ui
 
@@ -150,18 +149,6 @@ class App(QtWidgets.QApplication):
     def open_add_plugin():
         """"Open the new plugin window"""
         App.get_window().push_view(ui.AddPluginPanel())
-
-    @staticmethod
-    def open_repo(repo_url, repo_path):
-        """Open a specific repo."""
-        try:
-            repo = GitRepository(repo_path)
-            App.get_window().push_view(ui.RepoPanel(repo_url=repo_url, repo_path=repo_path, repo=repo))
-        except Exception as e:
-            Logger.warning(f'MEG UIManager: {e}')
-            Logger.warning(f'MEG UIManager: Could not load repo in "{repo_path}"')
-            # Popup
-            QtWidgets.QMessageBox.warning(App.get_window(), App.get_name(), f'Could not load the repo "{repo_path}"')
 
     @staticmethod
     def open_clone_panel():

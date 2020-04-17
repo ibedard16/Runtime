@@ -74,4 +74,3 @@ class Locking:
         """Save current locks to the local lockfile
         """
         self._lockFile.save()
-

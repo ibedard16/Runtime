@@ -3,7 +3,6 @@
 
 import pkg_resources
 from PyQt5 import QtWidgets, QtGui, uic
-from meg_runtime.config import Config
 from meg_runtime.logger import Logger
 from meg_runtime.app import App
 

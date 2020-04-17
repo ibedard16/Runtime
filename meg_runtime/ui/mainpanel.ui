@@ -65,6 +65,12 @@
       <property name="text">
        <string>Project</string>
       </property>
+      <property name="text">
+       <string>URL</string>
+      </property>
+      <property name="text">
+       <string>Path</string>
+      </property>
      </column>
     </widget>
    </item>
