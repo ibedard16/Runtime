@@ -8,10 +8,10 @@ import os
 from meg_runtime.logger import Logger
 
 
-class PermissionsManager(dict):
+class Permissions(dict):
     """Permissions manager - one for each repository"""
 
-    PERMISSION_FILE = ".meg/permissions.json"
+    PERMISSION_PATH = ".meg/permissions.json"
 
     def __init__(self):
         """Load the repository permission file"""
@@ -35,11 +35,11 @@ class PermissionsManager(dict):
             }
         })
         try:
-            self.update(json.load(open(PermissionsManager.PERMISSION_FILE)))
+            self.update(json.load(open(Permissions.PERMISSION_PATH)))
         except FileNotFoundError as e:
             # Log that loading the configuration failed
             Logger.warning('MEG Permission: {0}'.format(e))
-            Logger.warning('MEG Permission: Could not load permissions file <' + PermissionsManager.PERMISSION_FILE + '>, using default permissions')
+            Logger.warning('MEG Permission: Could not load permissions file <' + Permissions.PERMISSION_PATH + '>, using default permissions')
 
     def get_users(self):
         """Returns a list of all users and their roles
@@ -57,12 +57,14 @@ class PermissionsManager(dict):
         """Return True if the current user can write to a specific path"""
         roles = self._get_roles(user)
         fileHasPermissions = path in self['files']
+        # Read only file flag denies global write permissions, allows write for file specific write permissions
+        readOnly = fileHasPermissions and self['files'][path]['read_only']
         for role in roles:
-            if role in self['general']['roles_write']:
+            if not readOnly and role in self['general']['roles_write']:
                 return True
             if fileHasPermissions and role in self['files'][path]['roles_write']:
                 return True
-        if user in self['general']['users_write']:
+        if not readOnly and user in self['general']['users_write']:
             return True
         if fileHasPermissions and user in self['files'][path]['users_write']:
             return True
@@ -118,9 +120,9 @@ class PermissionsManager(dict):
 
     def save(self):
         """Save currenly held permissions / roles to file"""
-        if not os.path.exists(PermissionsManager.PERMISSION_FILE):
-            os.makedirs(os.path.dirname(PermissionsManager.PERMISSION_FILE), exist_ok=True)
-        json.dump(self, open(PermissionsManager.PERMISSION_FILE, 'w+'))
+        if not os.path.exists(Permissions.PERMISSION_PATH):
+            os.makedirs(os.path.dirname(Permissions.PERMISSION_PATH), exist_ok=True)
+        json.dump(self, open(Permissions.PERMISSION_PATH, 'w+'))
 
     def _get_roles(self, user):
         """Get a list of users from the configuration file."""

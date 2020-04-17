@@ -1,6 +1,6 @@
 """Runtime library unit testing"""
 
-# from meg_runtime import Config, GitManager, PermissionsManager, Plugin, PluginManager
+# from meg_runtime import Config, GitManager, Permissions, Plugin, PluginManager
 
 
 # General runtime test

@@ -21,6 +21,8 @@ def temp_session_repo_path():
     # After session remove the remove repository path
     if os.path.exists(repo_path):
         shutil.rmtree(repo_path, True)
+    if os.path.exists(".meg"):
+        shutil.rmtree(".meg")
 
 
 # PyTest fixture to get temporary path for git repo tests

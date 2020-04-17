@@ -6,11 +6,13 @@
     "files": {
         "a": {
             "users_write": [],
-            "roles_write": ["manager"]
+            "roles_write": ["manager"],
+            "read_only": false
         },
         "b": {
             "users_write": ["user2"],
-            "roles_write": []
+            "roles_write": [],
+            "read_only": false
         }
     },
     "general": {

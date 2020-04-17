@@ -19,13 +19,17 @@ class LockFile(MutableMapping):
     """Parse a lockfile and preform locking operations
     """
 
-    def __init__(self, filepath):
+    def __init__(self, filepath=None, blob=None):
         """Open a lockfile and initalize class with it
         Args:
             filepath (string): path to the lockfile
+            blob (string): blob of json data
         """
         self._lockData = {}
-        self.load(filepath)
+        if blob is None:
+            self.load(filepath)
+        else:
+            self.loads(blob)
 
     def __getitem__(self, filepath):
         """Get file entry, files have locks on them if and only if they have an entry
@@ -69,11 +73,7 @@ class LockFile(MutableMapping):
         Must be ran to save any new or removed locks
         Will create file if it doesn't already exist
         """
-        fileData = {
-                    "comment": "MEG System locking file, do not manually editing",
-                    "locks": self._lockData
-                }
-        json.dump(fileData, open(self._filepath, 'w'))
+        json.dump(self._lockData, open(self._filepath, 'w'))
 
     def load(self, filepath=None):
         """Loads this object with the current data in the lockfile, overrideing its current data
@@ -91,14 +91,31 @@ class LockFile(MutableMapping):
             if(not os.path.exists(filepath)):
                 self._createLockFile(filepath)
         try:
-            self._lockData = json.load(open(filepath))["locks"]
+            self._lockData = json.load(open(filepath))
         except (json.decoder.JSONDecodeError, KeyError):
             self._createLockFile(filepath)
             try:
-                self._lockData = json.load(open(filepath))["locks"]
+                self._lockData = json.load(open(filepath))
             except (json.decoder.JSONDecodeError, KeyError):
                 Logger.warning("MEG Locking: Unable to read contents of lock file at {0}".format(self._filepath))
                 return False
+        return True
+
+    def loads(self, s):
+        """Loads this object with the current data in the lockfile, overrideing its current data
+        If the file doesn't exist, create one
+        Args:
+            s (string | bytes | bytearray): a json containing string
+        Returns:
+            (bool): False if json was malformed
+        """
+        self._lockData = {}
+        self._filepath = None
+        try:
+            self._lockData = json.loads(s)
+        except (json.decoder.JSONDecodeError, KeyError):
+            Logger.warning("MEG Locking: Blob json is malformed")
+            return False
         return True
 
     def _createLockFile(self, filepath):
