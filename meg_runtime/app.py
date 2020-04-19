@@ -241,6 +241,11 @@ class App(QtWidgets.QApplication):
         App.get_window().set_view(App.get_clone_panel())
 
     @staticmethod
+    def open_manage_roles():
+        """Open the manage plugins window."""
+        ui.UIManager.push_view(ui.RolesPanel())
+
+    @staticmethod
     def open_repo_panel():
         """Open a repository."""
         dialog = QtWidgets.QFileDialog()

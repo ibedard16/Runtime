@@ -60,7 +60,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -87,8 +87,15 @@
     </property>
     <addaction name="action_Manage_Plugins"/>
    </widget>
+   <widget class="QMenu" name="menuRoles">
+    <property name="title">
+     <string>Permissions</string>
+    </property>
+    <addaction name="action_Manage_Roles"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Plugins"/>
+   <addaction name="menuRoles"/>
    <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -126,6 +133,7 @@
    <addaction name="separator"/>
    <addaction name="action_Preferences"/>
    <addaction name="action_Manage_Plugins"/>
+   <addaction name="action_Manage_Roles"/>
    <addaction name="separator"/>
   </widget>
   <action name="action_Open">
@@ -182,6 +190,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+M</string>
+   </property>
+  </action>
+  <action name="action_Manage_Roles">
+   <property name="text">
+    <string>&amp;Manage Roles</string>
+   </property>
+   <property name="toolTip">
+    <string>Manage roles</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
   <action name="action_Preferences">
