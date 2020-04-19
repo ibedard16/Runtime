@@ -31,10 +31,10 @@ class ClonePanel(BasePanel):
         else:
             Logger.warning(f'MEG UIManager: Could not clone repo "{repo_url}"')
             QtWidgets.QMessageBox.warning(App.get_window(), App.get_name(), f'Could not clone the repo "{repo_url}"')
-    
+
     def _save_repo_entry_in_config(self, repo_url, repo_path):
         repos = Config.get('repos', defaultValue=[])
-        duplicate_found  = False
+        duplicate_found = False
         for index, repo in enumerate(repos):
             if repo['path'] == repo_path:
                 repos[index]['url'] = repo_url

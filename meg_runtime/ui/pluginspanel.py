@@ -51,6 +51,11 @@ class PluginsPanel(ui.BasePanel):
         # disable buttons
         self.changeButtonStates()
 
+    def on_close(self):
+        """Closing the panel."""
+        # Hide the add plugins panel when the plugins panel is hidden
+        App.get_window().remove_view(self.get_add_plugin_panel())
+
     def open_add_plugin(self):
         """"Open the new plugin window"""
         App.get_window().push_view(self.get_add_plugin_panel())
@@ -85,5 +90,5 @@ class PluginsPanel(ui.BasePanel):
         item = self.plugin_list.currentItem()
         if item is not None and PluginManager.uninstall(item.text(1)):
             Config.save()
-            self.plugin_list.removeTopLevelItem(item)
+            (item.parent() or self.plugin_list.invisibleRootItem()).removeChild(item)
             self.changeButtonStates()

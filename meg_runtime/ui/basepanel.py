@@ -3,6 +3,7 @@
 import pkg_resources
 from PyQt5 import QtGui, QtWidgets, uic
 from meg_runtime.logger import Logger
+from meg_runtime.app import App
 
 
 class BasePanel(QtWidgets.QMainWindow):
@@ -36,8 +37,6 @@ class BasePanel(QtWidgets.QMainWindow):
         self._icon = self.__class__.__icon if icon_path is None else QtGui.QIcon(icon_path)
         # Load the dynamic widgets
         self.on_load()
-
-    
 
     def get_widgets(self):
         """Get the widgets of this panel."""
@@ -74,6 +73,14 @@ class BasePanel(QtWidgets.QMainWindow):
     def on_hide(self):
         """Hiding the panel."""
         pass
+
+    def on_close(self):
+        """Closing the panel."""
+        pass
+
+    def visible(self):
+        """Panel is visible."""
+        return self in App.get_window().get_panels()
 
     # Load the UI file
     def _load_ui_file(self):

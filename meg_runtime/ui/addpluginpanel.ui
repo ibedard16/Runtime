@@ -20,7 +20,7 @@
    <item>
     <widget class="QRadioButton" name="availableRadioButton">
      <property name="text">
-      <string>Choose Available Plugin</string>
+      <string>Choose Available Plugin:</string>
      </property>
      <property name="checked">
       <bool>true</bool>
@@ -114,7 +114,7 @@
    <item>
     <widget class="QRadioButton" name="fileRadioButton">
      <property name="text">
-      <string>Select File</string>
+      <string>Choose Plugin Archive:</string>
      </property>
     </widget>
    </item>
@@ -148,7 +148,7 @@
          <string/>
         </property>
         <property name="text">
-         <string>Choose File</string>
+         <string>Choose Archive</string>
         </property>
        </widget>
       </item>
@@ -188,7 +188,7 @@
    <item>
     <widget class="QRadioButton" name="urlRadioButton">
      <property name="text">
-      <string>Provide Plugin URL</string>
+      <string>Provide Plugin Archive URL:</string>
      </property>
     </widget>
    </item>

@@ -18,6 +18,7 @@ class App(QtWidgets.QApplication):
     NAME = 'Multimedia Extensible Git'
     VERSION = '0.1'
     ICON_PATH = 'ui/images/git.svg'
+    URL = 'https://github.com/MultimediaExtensibleGit'
 
     __instance = None
 
@@ -81,7 +82,13 @@ class App(QtWidgets.QApplication):
 
     @staticmethod
     def get_icon():
+        """Get application icon path"""
         return None if App.__instance is None else App.__instance.icon()
+
+    @staticmethod
+    def get_url():
+        """Get application URL"""
+        return None if App.__instance is None else App.__instance.url()
 
     @staticmethod
     def quit(exit_code=0):
@@ -99,6 +106,10 @@ class App(QtWidgets.QApplication):
     def icon(self):
         """Get the application icon path"""
         return pkg_resources.resource_filename(__name__, App.ICON_PATH)
+
+    def url(self):
+        """Get application URL"""
+        return App.URL
 
     def main_panel(self):
         """Get the application main panel"""
@@ -169,12 +180,13 @@ class App(QtWidgets.QApplication):
     @staticmethod
     def open_about():
         """Open the about menu."""
-        desc = (f'<h2>{App.get_name()}</h2>'
-                f'<b>Version {App.get_version()}</b>'
+        desc = (f'<center><h2>{App.get_name()}</h2>'
+                f'<p><b>Version {App.get_version()}</b><br/>'
+                f'<a href="{App.get_url()}">{App.get_url()}</a></p>'
                 f'<p>Qt version {QtCore.QT_VERSION_STR}<br/>'
                 f'PyQt version {QtCore.PYQT_VERSION_STR}<br/>'
                 f'Python version {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}<br/>'
-                f'Font Awesome version 5.13.0</p>')
+                f'Font Awesome version 5.13.0</p></center>')
         QtWidgets.QMessageBox.about(App.get_window(), f'About {App.get_name()}', desc)
 
     @staticmethod

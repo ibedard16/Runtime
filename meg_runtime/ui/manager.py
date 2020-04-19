@@ -26,7 +26,7 @@ class UIManager(QtWidgets.QMainWindow):
         # Setup window resource
         UIManager.__widgets[0]().setupUi(self)
         # Set the window panel stack
-        self._panels = None
+        self._panels = []
         self._current_panel = None
         # Set handler for closing a panel
         self._panelwidget = self.findChild(QtWidgets.QTabWidget, 'panelwidget')
@@ -81,27 +81,27 @@ class UIManager(QtWidgets.QMainWindow):
 
     def get_panel_by_index(self, index):
         """Get a panel in the window panel stack by index"""
-        # Get panels
-        panels = self.get_panels()
-        # Get the panel by index
-        return None if index < 0 or index >= len(panels) else panels[index]
+        # Get panel container
+        container = self.get_panel_container()
+        if container is not None:
+            # Get the widgets of the panel
+            widgets = container.widget(index)
+            if widgets is not None:
+                # Check the panels for matching widgets
+                for panel in self.get_panels():
+                    if panel.get_widgets() == widgets:
+                        # Found the panel
+                        return panel
+        # Panel not found
+        return None
 
     def get_current_panel(self):
         """Get the current panel in the window stack"""
-        # panels = self.get_panels()
-        # # Get the window central widget
-        # container = self.get_panel_container()
-        # if container is not None:
-        #     # Get the index of the current panel
-        #     index = container.currentIndex()
-        #     if index < len(panels) and index >= 0:
-        #         # Return the panel at that index
-        #         return panels[index]
-        # # Panel not found
         return self._current_panel
 
     def push_view(self, panel):
         """Push a panel onto the stack being viewed."""
+        Logger.debug(f'MEG UI: Adding panel "{panel.get_name()}"')
         # Hide the current panel
         current_panel = self.get_current_panel()
         if current_panel is not None:
@@ -132,20 +132,16 @@ class UIManager(QtWidgets.QMainWindow):
 
     def set_view(self, panel):
         """Set the panel to be viewed in the stack or push the panel onto the stack being viewed."""
-        panels = self.get_panels()
         # Get the window central widget
         container = self.get_panel_container()
         if container is not None:
-            index = None
-            try:
-                # Get the index of the panel
-                index = panels.index(panel)
-            except Exception:
-                pass
-            if index is not None:
+            # Get the index of the panel
+            index = container.indexOf(panel.get_widgets())
+            if index >= 0:
                 # Set the new panel
                 container.setCurrentIndex(index)
                 # Do not continue since the panel was found do not push
+                Logger.debug(f'MEG UI: Setting panel "{panel.get_name()}"')
                 return
         # Push the panel instead because it was not found
         self.push_view(panel)
@@ -155,24 +151,24 @@ class UIManager(QtWidgets.QMainWindow):
         # Check if the panel is closable
         if panel is not None and panel.get_is_closable():
             Logger.debug(f'MEG UI: Removing panel "{panel.get_name()}"')
-            # Get the all panels
+            # Close the panel
+            panel.on_hide()
+            panel.on_close()
+            # Remove the panel from the list
             panels = self.get_panels()
-            if panels is not None:
+            if panel in panels:
+                panels.remove(panel)
+            if self._current_panel == panel:
+                self._current_panel = None
+            # Get the window central widget
+            container = self.get_panel_container()
+            if container:
                 # Get the index of this panel
-                index = None
-                try:
-                    index = panels.index(panel)
-                except Exception:
-                    pass
-                if index is not None:
-                    # Remove the panel from the list
-                    panels.remove(panel)
-                    # Get the window central widget
-                    container = self.get_panel_container()
-                    if container:
-                        # Remove the panel from the view stack
-                        container.removeTab(index)
-                        panel.get_widgets().setParent(None)
+                index = container.indexOf(panel.get_widgets())
+                if index >= 0:
+                    # Remove the panel from the view stack
+                    container.removeTab(index)
+                    panel.get_widgets().setParent(None)
 
     def remove_view_by_index(self, index):
         """Remove a panel from the stack being viewed."""
