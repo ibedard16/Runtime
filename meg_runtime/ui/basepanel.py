@@ -37,6 +37,8 @@ class BasePanel(QtWidgets.QMainWindow):
         # Load the dynamic widgets
         self.on_load()
 
+    
+
     def get_widgets(self):
         """Get the widgets of this panel."""
         return self._widgets

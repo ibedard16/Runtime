@@ -8,13 +8,18 @@ from meg_runtime.ui.basepanel import BasePanel
 class AddPluginPanel(BasePanel):
     """Setup the plugin panel."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, plugins_panel, **kwargs):
         super().__init__(**kwargs)
         self.selected_file = None
+        self._plugins_panel = plugins_panel
 
     def get_title(self):
         """Get the title of this panel."""
         return 'Add New Plugin'
+
+    def get_plugins_panel(self):
+        """Get the plugins panel that spawned this panel."""
+        return self._plugins_panel
 
     def on_load(self):
         """Load dynamic elements within the panel."""
