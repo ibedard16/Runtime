@@ -23,7 +23,7 @@ class RepoPanel(BasePanel):
 
     def get_status(self):
         """Get the status of this panel."""
-        return f'{self._repo.path} : {self._repo.head.shorthand}'
+        return f'{self._repo.head.shorthand} : {self._repo.path}'
 
     def get_changes(self):
         """Do a pull for the repository."""
