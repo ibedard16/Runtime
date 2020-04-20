@@ -1,5 +1,5 @@
 
-from PyQt5 import QtCore, QtWebEngineWidgets
+from PyQt5 import QtCore, QtWidgets
 from meg_runtime.ui.basepanel import BasePanel
 
 
