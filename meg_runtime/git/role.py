@@ -11,7 +11,7 @@ class Role():
         self.can_remove_lock = False
         self.can_write = False
         self.can_grant_permissions = False
-        self.can_add_role = False
+        self.can_modify_roles = False
         # process permissions
         for permissionName in permissions:
             self.give_permission(permissionName)

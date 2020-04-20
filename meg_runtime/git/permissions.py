@@ -43,13 +43,13 @@ class Permissions(dict):
         self._construct_roles_from_permission(rolesList, 'roles_write')
         self._construct_roles_from_permission(rolesList, 'roles_grant')
         self._construct_roles_from_permission(rolesList, 'roles_modify_roles')
-        return rolesList
+        return rolesList.values()
     
     def _construct_roles_from_permission(self, rolesList, permissionName):
         """Adds any roles present in the permissionName to the rolesList"""
         for roleName in self['general'][permissionName]:
-            if (rolesList[roleName] is not None):
-                rolesList[roleName].give_role(permissionName)
+            if (rolesList.get(roleName) is not None):
+                rolesList.get(roleName).give_permission(permissionName)
             else:
                 rolesList[roleName] = Role(roleName, [permissionName])
 
