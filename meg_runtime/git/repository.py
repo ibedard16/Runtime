@@ -166,11 +166,25 @@ class GitRepository(Repository):
         """
         # Merge will stage changes automaticly and find conflicts
         self.merge(remoteId)
-        conflitPaths = []
         if self.index.conflicts is not None:
+            # Resolve Locks and Permissions conflicts first
             for conflict in self.index.conflicts:
                 path = self.pathFromConflict(conflict)
-                conflitPaths.append(path)
+                if path == Locking.LOCKFILE_PATH or path == Permissions.PERMISSION_PATH:
+                    # For conflicting Locks or Permissions that have been changed on remote, it is safest to discard local version and accept the remote
+                    self.writeConflictResolution(conflict[2], path)
+            # Remove Locks conflict and reload
+            if Locking.LOCKFILE_PATH in self.index.conflicts:
+                # TODO: Reload Locks
+                del self.index.conflicts[Locking.LOCKFILE_PATH]
+            # Remove Permissions conflict and reload
+            if Permissions.PERMISSION_PATH in self.index.conflicts:
+                # TODO: Reload Permissions
+                del self.index.conflicts[Permissions.PERMISSION_PATH]
+            # Resolve remaining conflicts
+            resolved_conflicts = []
+            for conflict in self.index.conflicts:
+                path = self.pathFromConflict(conflict)
                 if not self.__permissions.can_write(username, path):
                     # Not allowed to write, use theirs
                     self.writeConflictResolution(conflict[2], path)
@@ -181,21 +195,21 @@ class GitRepository(Repository):
                     else:
                         # Else its our lock
                         self.writeConflictResolution(conflict[1], path)
-                elif path == Locking.LOCKFILE_PATH:
-                    # For conflicting Locks that have been changed on remote, it is safest to discard local version and accept the remote
-                    self.writeConflictResolution(conflict[2], path)
-                elif path == Permissions.PERMISSION_PATH:
-                    # For conflicting Permissions that have been changed on remote, it is safest to discard local version and accept the remote
-                    self.writeConflictResolution(conflict[2], path)
                 else:
                     # TODO: Some other merge logic from plugins and other stuff
+                    # continue
                     # Currently just use ours
                     self.writeConflictResolution(conflict[1], path)
-            for conflit in conflitPaths:
-                del self.index.conflicts[conflit]
-        # Commit the merge
-        self.index.add_all()
-        self.create_commit('HEAD', self.default_signature, self.default_signature, "MEG MERGE", self.index.write_tree(), [self.head.target, remoteId])
+                # Add path to resolve conflict
+                resolved_conflicts.append(path)
+            # Remove all resolved conflicts
+            for conflict in resolved_conflicts:
+                del self.index.conflicts[conflict]
+        # Check there are no merge conflicts before committing
+        if self.index.conflicts is None or len(self.index.conflicts) == 0:
+            # Commit the merge
+            self.index.add_all()
+            self.create_commit('HEAD', self.default_signature, self.default_signature, "MEG MERGE", self.index.write_tree(), [self.head.target, remoteId])
 
     def writeConflictResolution(self, indexEntry, path):
         """For simple merge conflict resolution, writes contentes of index entry to file
