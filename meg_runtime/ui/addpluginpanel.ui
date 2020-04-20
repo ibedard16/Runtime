@@ -13,10 +13,7 @@
     <height>593</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Form</string>
-  </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QRadioButton" name="availableRadioButton">
      <property name="text">
@@ -31,11 +28,6 @@
     <widget class="QTreeWidget" name="availablePluginList">
      <property name="enabled">
       <bool>true</bool>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
      </property>
      <property name="alternatingRowColors">
       <bool>true</bool>
@@ -96,7 +88,7 @@
        <number>0</number>
       </property>
       <item>
-       <spacer name="horizontalSpacer_3">
+       <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -278,7 +270,7 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>100</width>
+          <width>120</width>
           <height>16777215</height>
          </size>
         </property>

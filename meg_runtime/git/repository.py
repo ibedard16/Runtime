@@ -49,8 +49,10 @@ class GitRepository(Repository):
     @property
     def path(self):
         if not self.is_empty:
-            return self.workdir
-        return super().path
+            path = self.workdir
+        else:
+            path = super().path
+        return os.path.abspath(path)
 
     # Git repository destructor
     def __del__(self):

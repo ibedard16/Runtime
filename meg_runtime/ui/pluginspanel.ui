@@ -7,25 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>511</height>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Plugins</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QLabel" name="pluginLabel">
-     <property name="font">
-      <font>
-       <pointsize>14</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Plugins</string>
-     </property>
-    </widget>
-   </item>
    <item>
     <widget class="QTreeWidget" name="pluginList">
      <property name="font">

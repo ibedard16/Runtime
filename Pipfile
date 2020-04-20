@@ -13,6 +13,7 @@ wheel = "*"
 [packages]
 PyQt5 = "*"
 pygit2 = "*"
+PyQtWebEngine = "*"
 pywin32 = {version = "*", os_name = "=='nt'"}
 python-dateutil = "*"
 requests = "*"

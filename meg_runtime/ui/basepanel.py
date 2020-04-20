@@ -50,6 +50,10 @@ class BasePanel(QtWidgets.QMainWindow):
         """Get the title of this panel."""
         return ''
 
+    def get_status(self):
+        """Get the status of this panel."""
+        return ''
+
     def get_icon(self):
         """Get the icon image of this panel."""
         return self._icon

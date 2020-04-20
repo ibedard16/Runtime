@@ -11,6 +11,7 @@ runtime_pkg_version = '0.0.0' if 'MEG_RUNTIME_PKG_VERSION' not in os.environ els
 
 required_packages = [
     'PyQt5',
+    'PyQtWebEngine',
     'pillow',
     'pygit2',
     'python-dateutil',

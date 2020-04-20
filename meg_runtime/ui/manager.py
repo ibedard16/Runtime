@@ -29,9 +29,11 @@ class UIManager(QtWidgets.QMainWindow):
         self._panels = []
         self._current_panel = None
         # Set handler for closing a panel
-        self._panelwidget = self.findChild(QtWidgets.QTabWidget, 'panelwidget')
-        self._panelwidget.tabCloseRequested.connect(self.remove_view_by_index)
-        self._panelwidget.currentChanged.connect(self._show_view_by_index)
+        self._panel = self.findChild(QtWidgets.QTabWidget, 'panelwidget')
+        self._panel.tabCloseRequested.connect(self.remove_view_by_index)
+        self._panel.currentChanged.connect(self._show_view_by_index)
+        # Get status widget
+        self._statusbar = self.findChild(QtWidgets.QStatusBar, 'statusbar')
         # Set handlers for main buttons
         # TODO: Add more handlers for these
         self._action_clone = self.findChild(QtWidgets.QAction, 'action_Clone')
@@ -55,13 +57,29 @@ class UIManager(QtWidgets.QMainWindow):
         """Update the window title from the current panel"""
         # Set the new window title, if provided by the panel
         if panel is not None and panel.get_title():
-            self.setWindowTitle(f'{App.get_name()} - {panel.get_title()}')
+            title = panel.get_title()
+            self.setWindowTitle(f'{App.get_name()} - {title}')
+            container = self.get_panel_container()
+            if container is not None:
+                index = container.indexOf(panel.get_widgets())
+                if index >= 0:
+                    container.setTabText(index, title)
+                    container.setTabIcon(index, panel.get_icon())
         else:
             self.setWindowTitle(f'{App.get_name()}')
 
+    def set_status(self, panel=None, timeout=0):
+        """Update the window status from the current panel"""
+        self.set_status_text('' if panel is None else panel.get_status(), timeout)
+
+    def set_status_text(self, message, timeout=0):
+        """Update the window status from the current panel"""
+        if self._statusbar is not None:
+            self._statusbar.showMessage('' if message is None else message, timeout)
+
     def get_panel_container(self):
         """Get the panel container widget"""
-        return self._panelwidget
+        return self._panel
 
     def get_panels(self):
         """Get all the panels in the window panel stack"""
@@ -110,6 +128,8 @@ class UIManager(QtWidgets.QMainWindow):
         panel.on_show()
         # Update the title for the panel
         self.set_title(panel)
+        # Update the status for the panel
+        self.set_status(panel)
         # Get the window central widget
         container = self.get_panel_container()
         if container is not None:
@@ -194,6 +214,8 @@ class UIManager(QtWidgets.QMainWindow):
             self._current_panel = panel
             # Update the title
             self.set_title(panel)
+            # Update the status
+            self.set_status(panel)
             # Show the new panel
             if panel is not None:
                 panel.on_show()
