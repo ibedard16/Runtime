@@ -1,5 +1,5 @@
-from PyQt5 import QtWidgets
 
+from PyQt5 import QtWidgets
 from meg_runtime.app import App
 from meg_runtime.plugins import PluginManager
 from meg_runtime.ui.basepanel import BasePanel
@@ -64,39 +64,40 @@ class AddPluginPanel(BasePanel):
             ]))
 
     def add_plugin(self):
-        """Finally add the chosen plugin"""
-        added = False
+        """Add the chosen plugin or show a message"""
+        message = self._add_plugin()
+        if message is not None:
+            QtWidgets.QMessageBox().critical(App.get_window(), App.get_name(), message)
+        else:
+            window = App.get_window()
+            window.set_view(self.get_plugins_panel())
+            window.remove_view(self)
+
+    def _add_plugin(self):
+        """Chose a plugin or return a message"""
         if self.available_radio_button.isChecked():
             selectedPlugin = self.available_plugin_list.currentItem()
             if selectedPlugin is None:
-                self.displayError('Please select an available plugin to install')
+                return 'Please select an available plugin to install'
             elif not PluginManager.install(selectedPlugin.text(0)):
-                self.displayError(f'Could not install plugin "{selectedPlugin}"')
-            else:
-                added = True
-        if self.file_radio_button.isChecked():
+                return f'Could not install plugin "{selectedPlugin}"'
+        elif self.file_radio_button.isChecked():
             if self.selected_file is None:
-                self.displayError('Please choose a plugin archive to install')
+                return 'Please choose a plugin archive to install'
             elif not PluginManager.install_archive(self.selected_file):
-                self.displayError(f'Could not install plugin from archive "{self.selected_file}"')
-            else:
-                added = True
-        if self.url_radio_button.isChecked():
+                return f'Could not install plugin from archive "{self.selected_file}"'
+        elif self.url_radio_button.isChecked():
             url = self.url_field.text()
             if url is None:
-                self.displayError('Please provide a plugin url to install')
+                return 'Please provide a plugin url to install'
             elif not PluginManager.install_archive_from_url(url):
-                self.displayError(f'Could not install plugin from URL "{url}"')
-            else:
-                added = True
-        if added:
-            window = App.get_window()
-            window.remove_view(self)
-            window.set_view(self.get_plugins_panel())
+                return f'Could not install plugin from URL "{url}"'
+        return None
 
     def enable_available_selection(self):
         """enable available plugin selection"""
         self.available_plugin_list.setEnabled(True)
+        self.refresh_available_button.setEnabled(True)
         self.disable_file_selection()
         self.disable_url_selection()
 
@@ -116,6 +117,7 @@ class AddPluginPanel(BasePanel):
     def disable_available_selection(self):
         """disables the available selection fields"""
         self.available_plugin_list.setEnabled(False)
+        self.refresh_available_button.setEnabled(False)
 
     def disable_file_selection(self):
         """disables the file selection fields"""
@@ -130,13 +132,14 @@ class AddPluginPanel(BasePanel):
         """open file dialog, save chosen file to self.selected_file"""
         fileDialog = QtWidgets.QFileDialog()
         fileDialog.setFileMode(QtWidgets.QFileDialog.ExistingFile)
+        filters = [
+            'Plugin Archives Files (*.zip *.tar *.tar.gz *.tar.bz2 *.tar.xz)',
+            'Any Files (*)'
+        ]
+        fileDialog.setNameFilters(filters)
         if fileDialog.exec_():
             self.selected_file = fileDialog.selectedFiles()[0]
             self.file_label.setText(self.selected_file)
-
-    def displayError(self, message):
-        """display a validation message to the user"""
-        QtWidgets.QMessageBox().critical(App.get_window(), App.get_name(), message)
 
     def refreshAvailableList(self):
         """refresh list of available plugins"""

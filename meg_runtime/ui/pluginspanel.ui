@@ -39,11 +39,8 @@
      <property name="selectionMode">
       <enum>QAbstractItemView::SingleSelection</enum>
      </property>
-     <property name="indentation">
-      <number>0</number>
-     </property>
      <property name="uniformRowHeights">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="itemsExpandable">
       <bool>false</bool>
@@ -51,17 +48,11 @@
      <property name="sortingEnabled">
       <bool>true</bool>
      </property>
-     <property name="headerHidden">
+     <property name="expandsOnDoubleClick">
       <bool>false</bool>
      </property>
      <attribute name="headerVisible">
       <bool>true</bool>
-     </attribute>
-     <attribute name="headerMinimumSectionSize">
-      <number>75</number>
-     </attribute>
-     <attribute name="headerDefaultSectionSize">
-      <number>75</number>
      </attribute>
      <column>
       <property name="text">

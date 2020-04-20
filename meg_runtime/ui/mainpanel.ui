@@ -16,6 +16,11 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QTreeWidget" name="treeWidget">
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="editTriggers">
       <set>QAbstractItemView::DoubleClicked</set>
      </property>
@@ -42,12 +47,6 @@
      </property>
      <attribute name="headerCascadingSectionResizes">
       <bool>true</bool>
-     </attribute>
-     <attribute name="headerMinimumSectionSize">
-      <number>50</number>
-     </attribute>
-     <attribute name="headerDefaultSectionSize">
-      <number>150</number>
      </attribute>
      <attribute name="headerShowSortIndicator" stdset="0">
       <bool>true</bool>
