@@ -28,6 +28,14 @@
    </item>
    <item>
     <widget class="QTreeWidget" name="roleList">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="cursor" stdset="0">
+      <cursorShape>ArrowCursor</cursorShape>
+     </property>
      <property name="uniformRowHeights">
       <bool>false</bool>
      </property>
@@ -53,7 +61,7 @@
      </column>
      <column>
       <property name="text">
-       <string>Grant roles</string>
+       <string>Grant permissions</string>
       </property>
      </column>
      <column>
@@ -66,19 +74,19 @@
        <string>admin</string>
       </property>
       <property name="text">
-       <string>🔵</string>
+       <string>✔</string>
       </property>
       <property name="text">
-       <string>🔵</string>
+       <string>✔</string>
       </property>
       <property name="text">
-       <string>🔵</string>
+       <string>✔</string>
       </property>
       <property name="text">
-       <string>🔵</string>
+       <string>✔</string>
       </property>
       <property name="text">
-       <string>🔵</string>
+       <string>✔</string>
       </property>
      </item>
      <item>
@@ -86,19 +94,19 @@
        <string>useless joe</string>
       </property>
       <property name="text">
-       <string>⚪</string>
+       <string>🗙</string>
       </property>
       <property name="text">
-       <string>⚪</string>
+       <string>🗙</string>
       </property>
       <property name="text">
-       <string>⚪</string>
+       <string>🗙</string>
       </property>
       <property name="text">
-       <string>⚪</string>
+       <string>🗙</string>
       </property>
       <property name="text">
-       <string>⚪</string>
+       <string>🗙</string>
       </property>
      </item>
     </widget>
@@ -113,6 +121,23 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
+       <widget class="QPushButton" name="editButton">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Edit</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addNewButton">
+        <property name="text">
+         <string>Add New Role</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="spacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -126,19 +151,16 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="editButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
+       <widget class="QPushButton" name="saveButton">
         <property name="text">
-         <string>Edit</string>
+         <string>Save</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="addNewButton">
+       <widget class="QPushButton" name="pushButton_2">
         <property name="text">
-         <string>Add New Role</string>
+         <string>Cancel</string>
         </property>
        </widget>
       </item>

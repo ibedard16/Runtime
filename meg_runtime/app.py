@@ -241,9 +241,9 @@ class App(QtWidgets.QApplication):
         App.get_window().set_view(App.get_clone_panel())
 
     @staticmethod
-    def open_manage_roles():
+    def open_manage_roles(repo):
         """Open the manage plugins window."""
-        App.get_window().push_view(ui.RolesPanel())
+        App.get_window().push_view(ui.RolesPanel(repo))
 
     @staticmethod
     def open_repo_panel():

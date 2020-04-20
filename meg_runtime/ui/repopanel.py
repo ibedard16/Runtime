@@ -35,6 +35,11 @@ class RepoPanel(BasePanel):
         """Send changes for the given repo."""
         if self._repo is not None:
             self._repo.push()
+        
+    def manage_roles(self):
+        """Manage roles for the given repo"""
+        if self._repo is not None:
+            App.open_manage_roles(self._repo)
 
     def on_load(self):
         """Load dynamic elements within the panel."""
@@ -43,6 +48,8 @@ class RepoPanel(BasePanel):
         self._get_changes_button.clicked.connect(self.get_changes)
         self._send_changes_button = instance.findChild(QtWidgets.QPushButton, 'sendChanges')
         self._send_changes_button.clicked.connect(self.send_changes)
+        self._manage_roles_button = instance.findChild(QtWidgets.QPushButton, 'manageRoles')
+        self._manage_roles_button.clicked.connect(self.manage_roles)
         self._branch_name_label = instance.findChild(QtWidgets.QLabel, 'branchName')
         # Setup the tree view of the repo if the repo folder exists
         if os.path.exists(self._repo.path):
