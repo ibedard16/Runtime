@@ -71,7 +71,7 @@
     <addaction name="action_Open"/>
     <addaction name="action_Clone"/>
     <addaction name="separator"/>
-    <addaction name="action_Settings"/>
+    <addaction name="action_Preferences"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
    </widget>
@@ -124,7 +124,7 @@
    <addaction name="action_Open"/>
    <addaction name="action_Clone"/>
    <addaction name="separator"/>
-   <addaction name="action_Settings"/>
+   <addaction name="action_Preferences"/>
    <addaction name="action_Manage_Plugins"/>
    <addaction name="separator"/>
   </widget>
@@ -184,10 +184,10 @@
     <string>Ctrl+M</string>
    </property>
   </action>
-  <action name="action_Settings">
+  <action name="action_Preferences">
    <property name="icon">
     <iconset>
-     <normaloff>images/settings.svg</normaloff>images/settings.svg</iconset>
+     <normaloff>images/preferences.svg</normaloff>images/preferences.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Preferences</string>

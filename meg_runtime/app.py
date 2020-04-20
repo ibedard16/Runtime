@@ -34,6 +34,7 @@ class App(QtWidgets.QApplication):
             App.__instance = self
             self._ui_manager = None
             self._main_panel = None
+            self._prefs_panel = None
             self._plugins_panel = None
             self._clone_panel = None
 
@@ -55,6 +56,13 @@ class App(QtWidgets.QApplication):
         if App.__instance is None:
             return None
         return App.__instance.main_panel()
+
+    @staticmethod
+    def get_prefs_panel():
+        """Get the preferences application panel"""
+        if App.__instance is None:
+            return None
+        return App.__instance.prefs_panel()
 
     @staticmethod
     def get_clone_panel():
@@ -116,6 +124,12 @@ class App(QtWidgets.QApplication):
         if self._main_panel is None:
             self._main_panel = ui.MainPanel()
         return self._main_panel
+
+    def prefs_panel(self):
+        """Get the application preferences panel"""
+        if self._prefs_panel is None:
+            self._prefs_panel = ui.PreferencesPanel()
+        return self._prefs_panel
 
     def clone_panel(self):
         """Get the application clone repository panel"""
@@ -190,8 +204,13 @@ class App(QtWidgets.QApplication):
         QtWidgets.QMessageBox.about(App.get_window(), f'About {App.get_name()}', desc)
 
     @staticmethod
+    def open_prefs_panel():
+        """Open the preferences."""
+        App.get_window().set_view(App.get_prefs_panel())
+
+    @staticmethod
     def open_plugins_panel():
-        """Open the manage plugins window."""
+        """Open the manage plugins."""
         App.get_window().set_view(App.get_plugins_panel())
 
     @staticmethod

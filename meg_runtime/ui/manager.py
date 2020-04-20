@@ -44,6 +44,8 @@ class UIManager(QtWidgets.QMainWindow):
         self._action_quit.triggered.connect(App.quit)
         self._action_about = self.findChild(QtWidgets.QAction, 'action_About')
         self._action_about.triggered.connect(App.open_about)
+        self._action_preferences = self.findChild(QtWidgets.QAction, 'action_Preferences')
+        self._action_preferences.triggered.connect(App.open_prefs_panel)
         self._action_manage_plugins = self.findChild(QtWidgets.QAction, 'action_Manage_Plugins')
         self._action_manage_plugins.triggered.connect(App.open_plugins_panel)
         # Set the default title

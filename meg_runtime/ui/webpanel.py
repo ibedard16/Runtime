@@ -5,10 +5,10 @@ from meg_runtime.app import App
 
 
 class WebPanel(BasePanel):
-    """Setup a list of cloned repos."""
+    """HTML web view panel for URL."""
 
     def __init__(self, url, **kwargs):
-        """MainPanel constructor."""
+        """WebPanel constructor."""
         self._url = url
         super().__init__(**kwargs)
 
