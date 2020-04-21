@@ -2,7 +2,7 @@
 """
 
 import pkg_resources
-from PyQt5 import QtWidgets, QtGui, uic
+from PyQt5 import QtCore, QtWidgets, QtGui, uic
 from meg_runtime.logger import Logger
 from meg_runtime.app import App
 
@@ -121,52 +121,94 @@ class UIManager(QtWidgets.QMainWindow):
 
     def push_view(self, panel):
         """Push a panel onto the stack being viewed."""
-        Logger.debug(f'MEG UI: Adding panel "{panel.get_name()}"')
-        # Hide the current panel
-        current_panel = self.get_current_panel()
-        if current_panel is not None:
-            current_panel.on_hide()
-        # Show the current panel
-        panel.on_show()
-        # Update the title for the panel
-        self.set_title(panel)
-        # Update the status for the panel
-        self.set_status(panel)
-        # Get the window central widget
-        container = self.get_panel_container()
-        if container is not None:
-            # Add the panel to the view stack
-            widgets = panel.get_widgets()
-            widgets.setParent(container)
-            title = panel.get_title()
-            index = container.addTab(widgets, 'Home' if not title else title)
-            # Remove the close button if not closable
-            tabbar = container.tabBar()
-            if not panel.get_is_closable():
-                tabbar.tabButton(index, QtWidgets.QTabBar.RightSide).deleteLater()
-                tabbar.setTabButton(index, QtWidgets.QTabBar.RightSide, None)
-            # Add the panel icon
-            tabbar.setTabIcon(index, panel.get_icon())
-            # Set the panel to the view
-            container.setCurrentIndex(index)
-            # Add the panel to the panel stack
-            self.get_panels().append(panel)
+        if panel is not None:
+            Logger.debug(f'MEG UI: Adding panel "{panel.get_name()}"')
+            # Hide the current panel
+            current_panel = self.get_current_panel()
+            if current_panel is not None:
+                current_panel.on_hide()
+            # Show the current panel
+            panel.on_show()
+            # Update the title for the panel
+            self.set_title(panel)
+            # Update the status for the panel
+            self.set_status(panel)
+            # Get the window central widget
+            container = self.get_panel_container()
+            if container is not None:
+                # Add the panel to the view stack
+                widgets = panel.get_widgets()
+                widgets.setParent(container)
+                title = panel.get_title()
+                index = container.addTab(widgets, 'Home' if not title else title)
+                # Remove the close button if not closable
+                tabbar = container.tabBar()
+                if not panel.get_is_closable():
+                    tabbar.tabButton(index, QtWidgets.QTabBar.RightSide).deleteLater()
+                    tabbar.setTabButton(index, QtWidgets.QTabBar.RightSide, None)
+                # Add the panel icon
+                tabbar.setTabIcon(index, panel.get_icon())
+                # Set the panel to the view
+                container.setCurrentIndex(index)
+                # Add the panel to the panel stack
+                self.get_panels().append(panel)
 
     def set_view(self, panel):
         """Set the panel to be viewed in the stack or push the panel onto the stack being viewed."""
-        # Get the window central widget
-        container = self.get_panel_container()
-        if container is not None:
-            # Get the index of the panel
-            index = container.indexOf(panel.get_widgets())
-            if index >= 0:
-                # Set the new panel
-                container.setCurrentIndex(index)
-                # Do not continue since the panel was found do not push
-                Logger.debug(f'MEG UI: Setting panel "{panel.get_name()}"')
-                return
-        # Push the panel instead because it was not found
-        self.push_view(panel)
+        if panel is not None:
+            # Get the window central widget
+            container = self.get_panel_container()
+            if container is not None:
+                # Get the index of the panel
+                index = container.indexOf(panel.get_widgets())
+                if index >= 0:
+                    # Set the new panel
+                    container.setCurrentIndex(index)
+                    # Do not continue since the panel was found do not push
+                    Logger.debug(f'MEG UI: Setting panel "{panel.get_name()}"')
+                    return
+            # Push the panel instead because it was not found
+            self.push_view(panel)
+
+    def popup_view(self, panel, resizable=False):
+        """Popup a dialog containing a panel."""
+        if panel is not None:
+            # Create a dialog window to popup
+            dialog = QtWidgets.QDialog(None, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+            dialog.setModal(True)
+            dialog.setSizeGripEnabled(resizable)
+            # Set dialog layout
+            layout = QtWidgets.QGridLayout()
+            layout.setContentsMargins(0, 0, 0, 0)
+            dialog.setLayout(layout)
+            # Add the panel widgets to the popup
+            widgets = panel.get_widgets()
+            layout.addWidget(widgets)
+            widgets.setParent(dialog)
+            # Set the dialog icon
+            icon = panel.get_icon()
+            dialog.setWindowIcon(icon if icon else QtWidgets.QIcon(App.get_icon()))
+            title = panel.get_title()
+            # Set the dialog title
+            dialog.setWindowTitle(title if title else App.get_name())
+            previous_panel = self._current_panel
+            # Hide the current panel
+            if previous_panel is not None:
+                previous_panel.on_hide()
+            # Make the panel the current
+            self._current_panel = panel
+            # Show the panel
+            panel.on_show()
+            # Show the dialog
+            dialog.setFixedSize(dialog.size())
+            dialog.exec_()
+            # Hide the panel
+            panel.on_hide()
+            # Restore the previous panel to current
+            self._current_panel = previous_panel
+            # Show the previous panel
+            if previous_panel is not None:
+                previous_panel.on_show()
 
     def remove_view(self, panel):
         """Remove a panel from the stack being viewed."""
