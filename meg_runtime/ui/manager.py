@@ -3,6 +3,7 @@
 
 import pkg_resources
 from PyQt5 import QtCore, QtWidgets, QtGui, uic
+from meg_runtime.config import Config
 from meg_runtime.logger import Logger
 from meg_runtime.app import App
 
@@ -55,6 +56,45 @@ class UIManager(QtWidgets.QMainWindow):
         icon_path = App.get_icon()
         if icon_path is not None:
             self.setWindowIcon(QtGui.QIcon(icon_path))
+        # Restore the state from the configuration if needed
+        window_state = Config.get('window/state', 'none')
+        state = self.windowState()
+        if window_state == 'maximized':
+            state &= ~(QtCore.Qt.WindowMinimized | QtCore.Qt.WindowFullScreen)
+            state |= QtCore.Qt.WindowMaximized
+        elif window_state == 'minimized':
+            state &= ~(QtCore.Qt.WindowMaximized | QtCore.Qt.WindowFullScreen)
+            state |= QtCore.Qt.WindowMinimized
+        elif window_state == 'fullscreen':
+            state &= ~(QtCore.Qt.WindowMinimized | QtCore.Qt.WindowMaximized)
+            state |= QtCore.Qt.WindowFullScreen
+        self.setWindowState(state)
+        # Restore the window geometry from the configuration if needed
+        geometry = Config.get('window/geometry', None)
+        if isinstance(geometry, list) and len(geometry) == 4:
+            self.setGeometry(geometry[0], geometry[1], geometry[2], geometry[3])
+
+    def closeEvent(self, event):
+        """The window was closed"""
+        # Determine the window state
+        state = self.windowState()
+        window_state = 'none'
+        if state & QtCore.Qt.WindowFullScreen:
+            window_state = 'fullscreen'
+        elif state & QtCore.Qt.WindowMaximized:
+            window_state = 'maximized'
+        elif state & QtCore.Qt.WindowMinimized:
+            window_state = 'minimized'
+        else:
+            # Save the window geometry for normal state
+            geometry = self.geometry()
+            Config.set('window/geometry', [ geometry.x(), geometry.y(), geometry.width(), geometry.height() ])
+        # Save the window state
+        Config.set('window/state', window_state)
+        # Save the configuration
+        Config.save()
+        # Continue to close the window
+        QtWidgets.QMainWindow.closeEvent(self, event)
 
     def set_title(self, panel=None):
         """Update the window title from the current panel"""
@@ -259,19 +299,20 @@ class UIManager(QtWidgets.QMainWindow):
         """Show the panel on click"""
         # Get the panel by index
         panel = self.get_panel_by_index(index)
-        # Get the current panel
-        current_panel = self.get_current_panel()
-        # Check if the panel is not the current panel
-        if current_panel != panel:
-            # Hide the current panel
-            if current_panel is not None:
-                current_panel.on_hide()
-            # Set the current panel
-            self._current_panel = panel
-            # Update the title
-            self.set_title(panel)
-            # Update the status
-            self.set_status(panel)
-            # Show the new panel
-            if panel is not None:
-                panel.on_show()
+        if panel is not None:
+            # Get the current panel
+            current_panel = self.get_current_panel()
+            # Check if the panel is not the current panel
+            if current_panel != panel:
+                # Hide the current panel
+                if current_panel is not None:
+                    current_panel.on_hide()
+                # Set the current panel
+                self._current_panel = panel
+                # Update the title
+                self.set_title(panel)
+                # Update the status
+                self.set_status(panel)
+                # Show the new panel
+                if panel is not None:
+                    panel.on_show()
