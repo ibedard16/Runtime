@@ -28,6 +28,7 @@ class UIManager(QtWidgets.QMainWindow):
         # Set the window panel stack
         self._panels = []
         self._current_panel = None
+        self._current_popup = None
         # Set handler for closing a panel
         self._panel = self.findChild(QtWidgets.QTabWidget, 'panelwidget')
         self._panel.tabCloseRequested.connect(self.remove_view_by_index)
@@ -119,6 +120,10 @@ class UIManager(QtWidgets.QMainWindow):
         """Get the current panel in the window stack"""
         return self._current_panel
 
+    def get_current_popup(self):
+        """Get the current popup dialog"""
+        return self._current_popup
+
     def push_view(self, panel):
         """Push a panel onto the stack being viewed."""
         if panel is not None:
@@ -172,12 +177,14 @@ class UIManager(QtWidgets.QMainWindow):
 
     def popup_view(self, panel, resizable=False):
         """Popup a dialog containing a panel."""
-        if panel is None:
+        if panel is None or self._current_popup is not None:
             return QtWidgets.QDialog.Rejected
         # Create a dialog window to popup
         dialog = QtWidgets.QDialog(None, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         dialog.setModal(True)
         dialog.setSizeGripEnabled(resizable)
+        # Set the current popup
+        self._current_popup = dialog
         # Set dialog layout
         layout = QtWidgets.QGridLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -206,6 +213,8 @@ class UIManager(QtWidgets.QMainWindow):
         result = dialog.exec_()
         # Hide the panel
         panel.on_hide()
+        # Remove the popup
+        self._current_popup = None
         # Restore the previous panel to current
         self._current_panel = previous_panel
         # Show the previous panel
