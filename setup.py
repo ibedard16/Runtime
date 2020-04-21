@@ -16,7 +16,7 @@ required_packages = [
     'pygit2',
     'python-dateutil',
     'requests',
-    'pywin32',
+    'pywin32;os_name=="nt"',
 ]
 
 setuptools.setup(
