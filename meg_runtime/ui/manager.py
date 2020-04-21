@@ -193,10 +193,10 @@ class UIManager(QtWidgets.QMainWindow):
                     tabbar.setTabButton(index, QtWidgets.QTabBar.RightSide, None)
                 # Add the panel icon
                 tabbar.setTabIcon(index, panel.get_icon())
-                # Set the panel to the view
-                container.setCurrentIndex(index)
                 # Add the panel to the panel stack
                 self.get_panels().append(panel)
+                # Set the panel to the view
+                container.setCurrentIndex(index)
 
     def set_view(self, panel):
         """Set the panel to be viewed in the stack or push the panel onto the stack being viewed."""
