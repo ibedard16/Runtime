@@ -152,7 +152,7 @@
     <addaction name="action_Open"/>
     <addaction name="action_Clone"/>
     <addaction name="separator"/>
-    <addaction name="action_Settings"/>
+    <addaction name="action_Preferences"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
    </widget>
