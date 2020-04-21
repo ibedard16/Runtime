@@ -172,43 +172,46 @@ class UIManager(QtWidgets.QMainWindow):
 
     def popup_view(self, panel, resizable=False):
         """Popup a dialog containing a panel."""
-        if panel is not None:
-            # Create a dialog window to popup
-            dialog = QtWidgets.QDialog(None, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
-            dialog.setModal(True)
-            dialog.setSizeGripEnabled(resizable)
-            # Set dialog layout
-            layout = QtWidgets.QGridLayout()
-            layout.setContentsMargins(0, 0, 0, 0)
-            dialog.setLayout(layout)
-            # Add the panel widgets to the popup
-            widgets = panel.get_widgets()
-            layout.addWidget(widgets)
-            widgets.setParent(dialog)
-            # Set the dialog icon
-            icon = panel.get_icon()
-            dialog.setWindowIcon(icon if icon else QtWidgets.QIcon(App.get_icon()))
-            title = panel.get_title()
-            # Set the dialog title
-            dialog.setWindowTitle(title if title else App.get_name())
-            previous_panel = self._current_panel
-            # Hide the current panel
-            if previous_panel is not None:
-                previous_panel.on_hide()
-            # Make the panel the current
-            self._current_panel = panel
-            # Show the panel
-            panel.on_show()
-            # Show the dialog
+        if panel is None:
+            return QtWidgets.QDialog.Rejected
+        # Create a dialog window to popup
+        dialog = QtWidgets.QDialog(None, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+        dialog.setModal(True)
+        dialog.setSizeGripEnabled(resizable)
+        # Set dialog layout
+        layout = QtWidgets.QGridLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        dialog.setLayout(layout)
+        # Add the panel widgets to the popup
+        widgets = panel.get_widgets()
+        layout.addWidget(widgets)
+        widgets.setParent(dialog)
+        # Set the dialog icon
+        icon = panel.get_icon()
+        dialog.setWindowIcon(icon if icon else QtWidgets.QIcon(App.get_icon()))
+        title = panel.get_title()
+        # Set the dialog title
+        dialog.setWindowTitle(title if title else App.get_name())
+        previous_panel = self._current_panel
+        # Hide the current panel
+        if previous_panel is not None:
+            previous_panel.on_hide()
+        # Make the panel the current
+        self._current_panel = panel
+        # Show the panel
+        panel.on_show()
+        # Show the dialog
+        if not resizable:
             dialog.setFixedSize(dialog.size())
-            dialog.exec_()
-            # Hide the panel
-            panel.on_hide()
-            # Restore the previous panel to current
-            self._current_panel = previous_panel
-            # Show the previous panel
-            if previous_panel is not None:
-                previous_panel.on_show()
+        result = dialog.exec_()
+        # Hide the panel
+        panel.on_hide()
+        # Restore the previous panel to current
+        self._current_panel = previous_panel
+        # Show the previous panel
+        if previous_panel is not None:
+            previous_panel.on_show()
+        return result
 
     def remove_view(self, panel):
         """Remove a panel from the stack being viewed."""
