@@ -13,6 +13,22 @@ class Permissions(dict):
 
     PERMISSION_PATH = ".meg/permissions.json"
 
+    ROLE_PERMISSIONS = [
+        "roles_remove_locks",
+        "roles_add_locks",
+        "roles_write",
+        "roles_grant",
+        "roles_modify_roles"
+    ]
+
+    USER_PERMISSIONS = [
+        "users_remove_locks",
+        "users_add_locks",
+        "users_write",
+        "users_grant",
+        "users_modify_roles"
+    ]
+
     def __init__(self, path):
         """Load the repository permission file"""
         self.__path = os.path.join(path, Permissions.PERMISSION_PATH)
@@ -96,6 +112,12 @@ class Permissions(dict):
         """If user is allowd to modify roles, delete the role. Cannot delete default role
         """
         if self.can_modify_roles(user) and role in self["roles"] and role != "default":
+            for permission in Permissions.ROLE_PERMISSIONS:
+                if role in self["general"][permission]:
+                    self["general"][permission].remove(role)
+            for path in self["files"]:
+                if role in self["files"][path]["roles_write"]:
+                    self["files"][path]["roles_write"].remove(role)
             del self["roles"][role]
             return True
         return False
@@ -233,7 +255,7 @@ class Permissions(dict):
             self.save()
 
     def get_roles(self, user):
-        """Get a list of users from the configuration file."""
+        """Get a list of roles applied to given user"""
         roles = [role for role in self['roles']
                  if user in self['roles'][role]]
         roles.insert(0, "default")
