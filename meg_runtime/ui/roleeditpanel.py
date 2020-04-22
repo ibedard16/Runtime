@@ -5,9 +5,9 @@ from meg_runtime.ui.basepanel import BasePanel
 
 class RoleEditPanel(BasePanel):
 
-    def __init__(self, rolesList, role, addNewRole, **kwargs):
+    def __init__(self, permissions, role, addNewRole, **kwargs):
         super().__init__(**kwargs)
-        self._rolesList = rolesList
+        self._permissions = permissions
         self._role = role
         self._addNewRole = addNewRole
     
@@ -28,6 +28,7 @@ class RoleEditPanel(BasePanel):
     def on_show(self):
         self._popup = App.get_window().get_current_popup()
         self._role_name_edit.setText(self._role.name)
+        self._role_name_edit.setEnabled(self._addNewRole)
         self._add_locks_box.setChecked(self._role.can_add_lock)
         self._remove_locks_box.setChecked(self._role.can_remove_lock)
         self._modify_files_box.setChecked(self._role.can_write)
@@ -42,8 +43,37 @@ class RoleEditPanel(BasePanel):
         self._role.can_grant_permissions = self._grant_permissions_box.isChecked()
         self._role.can_modify_roles = self._modify_roles_box.isChecked()
         if self._addNewRole:
-            self._rolesList.append(self._role)
+            self._permissions.create_role('user', self._role.name) # TODO: Use actual name
+        self.apply_roles()
         self._popup.accept()
+
+    def apply_roles(self):
+        # TODO: Use actual user name
+        # can add lock
+        if self._role.can_add_lock:
+            self._permissions.add_role_permission('user', self._role.name, 'roles_add_locks')
+        else:
+            self._permissions.remove_role_permission('user', self._role.name, 'roles_add_locks')
+        # can remove lock
+        if self._role.can_remove_lock:
+            self._permissions.add_role_permission('user', self._role.name, 'roles_remove_locks')
+        else:
+            self._permissions.remove_role_permission('user', self._role.name, 'roles_remove_locks')
+        # can write
+        if self._role.can_write:
+            self._permissions.add_role_permission('user', self._role.name, 'roles_write')
+        else:
+            self._permissions.remove_role_permission('user', self._role.name, 'roles_write')
+        # can grant permission
+        if self._role.can_grant_permissions:
+            self._permissions.add_role_permission('user', self._role.name, 'roles_grant')
+        else:
+            self._permissions.remove_role_permission('user', self._role.name, 'roles_grant')
+        # can modify roles
+        if self._role.can_modify_roles:
+            self._permissions.add_role_permission('user', self._role.name, 'roles_modify_roles')
+        else:
+            self._permissions.remove_role_permission('user', self._role.name, 'roles_modify_roles')
 
     def cancel(self):
         self._popup.reject()

@@ -21,8 +21,6 @@ class RolesPanel(BasePanel):
     def on_load(self):
         """Load static elements within the panel"""
         self.attach_ui_elements()
-        self._all_roles = list(self._repo.permissions.get_roles().values())
-        self._deleted_roles = []
     
     def on_show(self):
         """Load dynamic elements within the panel"""
@@ -51,6 +49,7 @@ class RolesPanel(BasePanel):
     def load_roles(self):
         """loads the roles from the current repo"""
         self.role_list_widget.clear()
+        self._all_roles = list(self._repo.permissions.get_roles().values())
         for role in self._all_roles:
             self.role_list_widget.addTopLevelItem(QtWidgets.QTreeWidgetItem([
                 role.name,
@@ -64,28 +63,28 @@ class RolesPanel(BasePanel):
     def open_add_role(self):
         """Opens the panel to add a new role"""
         newRole = Role('new role')
-        App.get_window().popup_view(ui.RoleEditPanel(self._all_roles, newRole, True))
+        App.get_window().popup_view(ui.RoleEditPanel(self._repo.permissions, newRole, True))
 
     def open_edit_role(self):
         """Opens the panel to edit a specific role"""
         currentRoleIndex = self._get_current_role_index()
-        App.get_window().popup_view(ui.RoleEditPanel(self._all_roles, self._all_roles[currentRoleIndex], False))
+        App.get_window().popup_view(ui.RoleEditPanel(self._repo.permissions, self._all_roles[currentRoleIndex], False))
 
     def delete_role(self):
         """removes the role from the list"""
         currentRoleIndex = self._get_current_role_index()
         if currentRoleIndex is not None:
-            if self._all_roles[currentRoleIndex].name == 'default':
+            currentRoleName = self._all_roles[currentRoleIndex].name
+            if currentRoleName == 'default':
                 QtWidgets.QMessageBox().critical(App.get_window(), App.get_name(), 'Cannot delete the default role, it is the role everyone has by default!')
-                return 
-            del self._all_roles[currentRoleIndex]
+                return
+            self._repo.permissions.delete_role('user', currentRoleName) #todo: use actual user name
             self.load_roles()
             self.edit_button.setEnabled(False)
             self.delete_button.setEnabled(False)
 
     def save(self):
-        # TODO
-        pass
+        self._repo.permissions.save()
 
     def cancel(self):
         """closes the panel"""
