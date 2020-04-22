@@ -6,7 +6,6 @@ from meg_runtime.logger import Logger
 from meg_runtime.git import GitManager
 from meg_runtime.ui.basepanel import BasePanel
 from meg_runtime.ui.repopanel import RepoPanel
-from meg_runtime.ui.filechooser import FileChooser
 
 
 class ClonePanel(BasePanel):
@@ -19,7 +18,6 @@ class ClonePanel(BasePanel):
 
     def clone(self):
         """Clone the repository."""
-        # TODO: Need to update the Home panel with the new repo
         # Setup repository
         username = None
         password = None
@@ -62,7 +60,6 @@ class ClonePanel(BasePanel):
 
     def choose_folder(self):
         """Open a dialog for choosing an empty folder or creating one."""
-        # TODO: Don't allow files to be shown
         dialog = QtWidgets.QFileDialog()
         # Only allow directories
         dialog.setFileMode(QtWidgets.QFileDialog.Directory)
