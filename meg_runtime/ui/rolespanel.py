@@ -1,14 +1,18 @@
 import os.path
 from PyQt5 import QtWidgets
 
+from meg_runtime.app import App
+from meg_runtime.git.role import Role
+from meg_runtime import ui
 from meg_runtime.ui.manager import UIManager
 from meg_runtime.ui.basepanel import BasePanel
 
 
+
 class RolesPanel(BasePanel):
     def __init__(self, repo, **kwargs):
-        super().__init__(**kwargs)
         self._repo = repo
+        super().__init__(**kwargs)
 
     def get_title(self):
         """Get the title of this panel."""
@@ -17,6 +21,8 @@ class RolesPanel(BasePanel):
     def on_load(self):
         """Load static elements within the panel"""
         self.attach_ui_elements()
+        self._all_roles = list(self._repo.permissions.get_roles().values())
+        self._deleted_roles = []
     
     def on_show(self):
         """Load dynamic elements within the panel"""
@@ -28,12 +34,16 @@ class RolesPanel(BasePanel):
         # buttons
         self.add_new_button = instance.findChild(QtWidgets.QPushButton, 'addNewButton')
         self.add_new_button.clicked.connect(self.open_add_role)
+        self.delete_button = instance.findChild(QtWidgets.QPushButton, 'deleteButton')
+        self.delete_button.setEnabled(False)
+        self.delete_button.clicked.connect(self.delete_role)
         self.edit_button = instance.findChild(QtWidgets.QPushButton, 'editButton')
         self.edit_button.setEnabled(False)
         self.edit_button.clicked.connect(self.open_edit_role)
         self.save_button = instance.findChild(QtWidgets.QPushButton, 'saveButton')
-        self.save_button.setEnabled(False)
+        self.save_button.clicked.connect(self.save)
         self.cancel_button = instance.findChild(QtWidgets.QPushButton, 'cancelButton')
+        self.cancel_button.clicked.connect(self.cancel)
         # roles list
         self.role_list_widget = instance.findChild(QtWidgets.QTreeWidget, 'roleList')
         self.role_list_widget.itemSelectionChanged.connect(self.on_role_selection)
@@ -41,7 +51,6 @@ class RolesPanel(BasePanel):
     def load_roles(self):
         """loads the roles from the current repo"""
         self.role_list_widget.clear()
-        self._all_roles = self._repo.permissions.get_roles()
         for role in self._all_roles:
             self.role_list_widget.addTopLevelItem(QtWidgets.QTreeWidgetItem([
                 role.name,
@@ -54,29 +63,50 @@ class RolesPanel(BasePanel):
 
     def open_add_role(self):
         """Opens the panel to add a new role"""
-        # TODO: Implement
-        pass
+        newRole = Role('new role')
+        App.get_window().popup_view(ui.RoleEditPanel(self._all_roles, newRole, True))
 
     def open_edit_role(self):
         """Opens the panel to edit a specific role"""
-        # TODO: Implement
+        currentRoleIndex = self._get_current_role_index()
+        App.get_window().popup_view(ui.RoleEditPanel(self._all_roles, self._all_roles[currentRoleIndex], False))
+
+    def delete_role(self):
+        """removes the role from the list"""
+        currentRoleIndex = self._get_current_role_index()
+        if currentRoleIndex is not None:
+            if self._all_roles[currentRoleIndex].name == 'default':
+                QtWidgets.QMessageBox().critical(App.get_window(), App.get_name(), 'Cannot delete the default role, it is the role everyone has by default!')
+                return 
+            del self._all_roles[currentRoleIndex]
+            self.load_roles()
+            self.edit_button.setEnabled(False)
+            self.delete_button.setEnabled(False)
+
+    def save(self):
+        # TODO
         pass
+
+    def cancel(self):
+        """closes the panel"""
+        App.get_window().remove_view(self)
 
     def on_role_selection(self):
         """Enables the edit button if a role was selected, otherwise disables it"""
-        currentRole = self.get_current_role()
-        self.edit_button.setEnabled(currentRole is not None)
+        currentRoleIndex = self._get_current_role_index()
+        self.edit_button.setEnabled(currentRoleIndex is not None)
+        self.delete_button.setEnabled(currentRoleIndex is not None)
 
-    def get_current_role(self):
+    def _get_current_role_index(self):
         """returns the currently selected role"""
-        selectedRole = self.role_list_widget.currentItem()
-        if selectedRole is None:
+        selectedRoleItem = self.role_list_widget.currentItem()
+        if selectedRoleItem is None:
             return None
-        selectedRoleName = selectedRole.text(0)
-        return selectedRoleName
+        selectedRoleIndex = self.role_list_widget.indexOfTopLevelItem(selectedRoleItem)
+        return selectedRoleIndex
 
     def _get_permission_display_char(self, permission):
         if permission:
             return chr(10004) # check mark
         else:
-            return chr(128473) # x mark
+            return ''

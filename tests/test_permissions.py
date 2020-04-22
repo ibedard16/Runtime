@@ -54,7 +54,7 @@ def test_grant_role(change_to_test_directory):
     perms = Permissions(".")
     perms.create_role("managerUser", "testRole")
     assert perms.grant_role("managerUser", "user2", "testRole")
-    assert "testRole" in perms.get_roles("user2")
+    assert "testRole" in perms.get_roles_for_user("user2")
     assert not perms.grant_role("managerUser", "user2", "nonExistantRole")
     assert not perms.grant_role("engineerUser", "user3", "testRole")
     assert not perms.grant_role("engineerUser", "engineerUser", "manager")
@@ -64,7 +64,7 @@ def test_remove_role(change_to_test_directory):
     Permissions.PERMISSION_PATH = 'test_permissions_01.json'
     perms = Permissions(".")
     assert perms.remove_role("managerUser", "user2", "engineer")
-    assert "engineer" not in perms.get_roles("user2")
+    assert "engineer" not in perms.get_roles_for_user("user2")
     assert not perms.grant_role("engineerUser", "managerUser", "manager")
 
 
@@ -73,7 +73,7 @@ def test_create_role(change_to_test_directory):
     perms = Permissions(".")
     assert perms.create_role("managerUser", "newRole")
     perms.grant_role("managerUser", "user2", "newRole")
-    assert "newRole" in perms.get_roles("user2")
+    assert "newRole" in perms.get_roles_for_user("user2")
     assert not perms.create_role("engineerUser", "badRole")
     assert not perms.create_role("managerUser", "default")
 
@@ -82,7 +82,7 @@ def test_delete_role(change_to_test_directory):
     Permissions.PERMISSION_PATH = 'test_permissions_01.json'
     perms = Permissions(".")
     assert perms.delete_role("managerUser", "engineer")
-    assert "engineer" not in perms.get_roles("engineerUser")
+    assert "engineer" not in perms.get_roles_for_user("engineerUser")
     assert not perms.delete_role("managerUser", "fakeRole")
     assert not perms.delete_role("engineerUser", "manager")
     assert not perms.delete_role("managerUser", "default")
