@@ -1,7 +1,7 @@
 {
     "roles": {
-        "manager": ["user1"],
-        "engineer": ["user2", "user3"]
+        "manager": ["user1", "user4", "managerUser"],
+        "engineer": ["user2", "user3", "user4", "engineerUser"]
     },
     "files": {
         "a": {
@@ -12,19 +12,19 @@
         "b": {
             "users_write": ["user2"],
             "roles_write": [],
-            "read_only": false
+            "read_only": true
         }
     },
     "general": {
-        "users_remove_locks": [],
-        "roles_remove_locks": [],
-        "users_add_locks": [],
-        "roles_add_locks": [],
-        "users_write": [],
-        "roles_write": [],
-        "users_grant": [],
-        "roles_grant": [],
-        "users_modify_roles": [],
-        "roles_modify_roles": []
+        "users_remove_locks": ["manager"],
+        "roles_remove_locks": ["manager"],
+        "users_add_locks": ["manager"],
+        "roles_add_locks": ["manager"],
+        "users_write": ["manager"],
+        "roles_write": ["manager"],
+        "users_grant": ["manager"],
+        "roles_grant": ["manager"],
+        "users_modify_roles": ["manager"],
+        "roles_modify_roles": ["manager"]
     }
 }

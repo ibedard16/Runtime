@@ -1,14 +1,12 @@
 {
     "roles": {
-        "default": [],
         "admin": []
     },
     "files": {
         "path/demo.txt": {
             "roles_write": ["admin"],
             "users_write": [],
-            "roles_read_only": ["default"],
-            "users_read_only": []
+            "read_only": true
         }
     },
     "general": {
