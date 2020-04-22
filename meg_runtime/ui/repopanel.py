@@ -1,7 +1,8 @@
 
-import os.path
+import os
+import platform
+import subprocess
 from PyQt5 import QtCore, QtWidgets
-
 from meg_runtime.app import App
 from meg_runtime.config import Config
 from meg_runtime.logger import Logger
@@ -60,5 +61,16 @@ class RepoPanel(BasePanel):
 
     def _handle_double_clicked(self, item):
         """Handle double clicking of a file (open it with another program)."""
-        # TODO
         path = self.tree_view.get_selected_path()
+        if not os.path.isdir(path):
+            try:
+                if platform.system() == 'Darwin':
+                    subprocess.run(['open', path])
+                elif platform.system() == 'Windows':
+                    os.startfile(path)
+                else:
+                    subprocess.run(['xdg-open', path])
+            except Exception as e:
+                Logger.warning(f'MEG RepoPanel: {e}')
+                Logger.warning(f'MEG RepoPanel: Could not open the file {path}')
+                QtWidgets.QMessageBox.warning(App.get_window(), App.get_name(), f'Could not open file "{path}"')
