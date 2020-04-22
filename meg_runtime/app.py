@@ -206,10 +206,7 @@ class App(QtWidgets.QApplication):
         spacer.addWidget(password)
         # Add the close button
         button = QtWidgets.QPushButton('OK')
-        def ok_click():
-            """Handle the OK button click."""
-            dialog.done(0)
-        button.clicked.connect(ok_click)
+        button.clicked.connect(dialog.accept)
         spacer.addWidget(button)
         dialog.setLayout(spacer)
         # Execute it
@@ -253,10 +250,23 @@ class App(QtWidgets.QApplication):
         if dialog.exec_():
             repo = GitManager.open(dialog.selectedFiles()[0])
             App.get_window().push_view(ui.RepoPanel(repo))
+            App.save_repo_entry(repo.path)
 
     @staticmethod
     def return_to_main():
         """Return to the main panel"""
         App.get_window().set_view(App.get_main_panel())
 
-    # TODO: Add more menu opening/closing methods here
+    @staticmethod
+    def save_repo_entry(repo_path, repo_url=None):
+        repos = Config.get('repos', defaultValue=[])
+        duplicate_found = False
+        for index, repo in enumerate(repos):
+            if repo['path'] == repo_path:
+                repos[index]['url'] = repo_url
+                duplicate_found = True
+                break
+        if not duplicate_found:
+            repos.append({'path': repo_path, 'url': repo_url})
+        Config.set('repos', repos)
+        Config.save()

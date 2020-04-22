@@ -88,7 +88,12 @@ class UIManager(QtWidgets.QMainWindow):
         else:
             # Save the window geometry for normal state
             geometry = self.geometry()
-            Config.set('window/geometry', [ geometry.x(), geometry.y(), geometry.width(), geometry.height() ])
+            Config.set('window/geometry', [
+                geometry.x(),
+                geometry.y(),
+                geometry.width(),
+                geometry.height()
+            ])
         # Save the window state
         Config.set('window/state', window_state)
         # Save the configuration

@@ -161,8 +161,8 @@ class GitRepository(Repository):
                     self.resolveLockingPermissionsMerge()
                     self.resolveGeneralMerge(username)
                 else:
-                     self.__permissions.load()
-                     self.__locking.load()
+                    self.__permissions.load()
+                    self.__locking.load()
                 # Check there are no merge conflicts before committing
                 if self.index.conflicts is None or len(self.index.conflicts) == 0:
                     # Commit the merge

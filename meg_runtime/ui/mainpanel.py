@@ -24,19 +24,20 @@ class MainPanel(BasePanel):
         """Load dynamic elements within the panel."""
         self._tree_widget = self.get_widgets().findChild(QtWidgets.QTreeWidget, 'treeWidget')
         self._tree_widget.itemDoubleClicked.connect(self._handle_double_click)
+        header = self._tree_widget.header()
+        header.resizeSection(1, header.sectionSize(0) * 2)
 
     def on_show(self):
         """Showing the panel."""
         # Load the repos
-        # TODO: Get this from the GitManager
         repos = Config.get('repos')
         repos = [
             QtWidgets.QTreeWidgetItem([
                 os.path.basename(repo['path']),
                 repo['path'],
-                repo['url'],
+                repo['url']
             ])
-            for repo in repos if repo['path'] and repo['url']
+            for repo in repos if repo['path']
         ]
         self._tree_widget.clear()
         self._tree_widget.addTopLevelItems(repos)

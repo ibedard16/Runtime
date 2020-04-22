@@ -34,37 +34,11 @@ class ClonePanel(BasePanel):
         # Set the config
         repo = GitManager.clone(repo_url, repo_path)
         if repo is not None:
-            self._save_repo_entry_in_config(repo_url, repo_path)
+            App.save_repo_entry(repo_path, repo_url)
             App.get_window().push_view(RepoPanel(repo))
         else:
             Logger.warning(f'MEG UIManager: Could not clone repo "{repo_url}"')
             QtWidgets.QMessageBox.warning(App.get_window(), App.get_name(), f'Could not clone the repo "{repo_url}"')
-
-    def _save_repo_entry_in_config(self, repo_url, repo_path):
-        repos = Config.get('repos', defaultValue=[])
-        duplicate_found = False
-        for index, repo in enumerate(repos):
-            if repo['path'] == repo_path:
-                repos[index]['url'] = repo_url
-                duplicate_found = True
-                break
-        if not duplicate_found:
-            repos.append({'url': repo_url, 'path': repo_path})
-        Config.set('repos', repos)
-        Config.save()
-
-    def _save_repo_entry_in_config(self, repo_url, repo_path):
-        repos = Config.get('repos', defaultValue=[])
-        duplicate_found  = False
-        for index, repo in enumerate(repos):
-            if repo['path'] == repo_path:
-                repos[index]['url'] = repo_url
-                duplicate_found = True
-                break
-        if not duplicate_found:
-            repos.append({'url': repo_url, 'path': repo_path})
-        Config.set('repos', repos)
-        Config.save()
 
     def get_title(self):
         """Get the title of this panel."""
@@ -74,10 +48,8 @@ class ClonePanel(BasePanel):
         """Load dynamic elements within the panel."""
         # Attach handlers
         instance = self.get_widgets()
-        self.ok_button = instance.findChild(QtWidgets.QPushButton, 'okButton')
+        self.ok_button = instance.findChild(QtWidgets.QPushButton, 'cloneButton')
         self.ok_button.clicked.connect(self.clone)
-        self.back_button = instance.findChild(QtWidgets.QPushButton, 'backButton')
-        self.back_button.clicked.connect(App.return_to_main)
         # Radio Buttons
         self.no_credentials_radio = instance.findChild(QtWidgets.QRadioButton, 'noCredenitalsRadio')
         self.enter_credentials_radio = instance.findChild(QtWidgets.QRadioButton, 'enterCredentialsRadio')
