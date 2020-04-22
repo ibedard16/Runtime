@@ -86,6 +86,10 @@ def test_delete_role(change_to_test_directory):
     assert not perms.delete_role("managerUser", "fakeRole")
     assert not perms.delete_role("engineerUser", "manager")
     assert not perms.delete_role("managerUser", "default")
+    perms.create_role("managerUser", "newRole")
+    perms.add_role_permission("managerUser", "newRole", "roles_write")
+    assert perms.delete_role("managerUser", "newRole")
+    assert "newRole" not in perms["general"]["roles_write"]
 
 
 def test_add_role_permission(change_to_test_directory):
