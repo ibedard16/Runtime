@@ -14,15 +14,23 @@ class ClonePanel(BasePanel):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # Directory to clone the repo into
+        self.directory = None
 
     def clone(self):
         """Clone the repository."""
+        # TODO: Need to update the Home panel with the new repo
         # Setup repository
-        repo_url = self.server_text_edit.toPlainText()
-        username = self.username_text_edit.toPlainText()
-        password = self.password_text_edit.toPlainText()
-        repo_path = self._tree_view.get_selected_path()
-        # TODO: Handle username + password
+        username = None
+        password = None
+        if self.enter_credentials_radio.isChecked():
+            (username, password) = App.open_credential_dialog()
+        elif self.use_stored_credentials_radio.isChecked():
+            pass
+            # TODO
+        repo_url = self.server_text_edit.text()
+        repo_path = self.directory
+        # TODO: Handle username+password
         # Set the config
         repo = GitManager.clone(repo_url, repo_path)
         if repo is not None:
@@ -45,6 +53,19 @@ class ClonePanel(BasePanel):
         Config.set('repos', repos)
         Config.save()
 
+    def _save_repo_entry_in_config(self, repo_url, repo_path):
+        repos = Config.get('repos', defaultValue=[])
+        duplicate_found  = False
+        for index, repo in enumerate(repos):
+            if repo['path'] == repo_path:
+                repos[index]['url'] = repo_url
+                duplicate_found = True
+                break
+        if not duplicate_found:
+            repos.append({'url': repo_url, 'path': repo_path})
+        Config.set('repos', repos)
+        Config.save()
+
     def get_title(self):
         """Get the title of this panel."""
         return 'Clone'
@@ -57,8 +78,23 @@ class ClonePanel(BasePanel):
         self.ok_button.clicked.connect(self.clone)
         self.back_button = instance.findChild(QtWidgets.QPushButton, 'backButton')
         self.back_button.clicked.connect(App.return_to_main)
-        self.server_text_edit = instance.findChild(QtWidgets.QTextEdit, 'server')
-        self.username_text_edit = instance.findChild(QtWidgets.QTextEdit, 'username')
-        self.password_text_edit = instance.findChild(QtWidgets.QTextEdit, 'password')
-        # Add the file viewer/chooser
-        self._tree_view = FileChooser(instance.findChild(QtWidgets.QTreeView, 'treeView'), Config.get('path/user'))
+        # Radio Buttons
+        self.no_credentials_radio = instance.findChild(QtWidgets.QRadioButton, 'noCredenitalsRadio')
+        self.enter_credentials_radio = instance.findChild(QtWidgets.QRadioButton, 'enterCredentialsRadio')
+        self.use_stored_credentials_radio = instance.findChild(QtWidgets.QRadioButton, 'useStoredCredentialsRadio')
+        # Add the choose folder handler
+        self.choose_folder_button = instance.findChild(QtWidgets.QPushButton, 'chooseFolderButton')
+        self.choose_folder_button.clicked.connect(self.choose_folder)
+        self.server_text_edit = instance.findChild(QtWidgets.QLineEdit, 'server')
+        self.chosen_directory_label = instance.findChild(QtWidgets.QLabel, 'chosenDirectoryLabel')
+
+    def choose_folder(self):
+        """Open a dialog for choosing an empty folder or creating one."""
+        # TODO: Don't allow files to be shown
+        dialog = QtWidgets.QFileDialog()
+        # Only allow directories
+        dialog.setFileMode(QtWidgets.QFileDialog.Directory)
+        dialog.setOption(QtWidgets.QFileDialog.ShowDirsOnly, True)
+        if dialog.exec_():
+            self.directory = dialog.selectedFiles()[0]
+            self.chosen_directory_label.setText(self.directory)

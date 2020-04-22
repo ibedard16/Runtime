@@ -192,6 +192,31 @@ class App(QtWidgets.QApplication):
             instance.exit(ret)
 
     @staticmethod
+    def open_credential_dialog():
+        """Open a credential dialog for the user and return (username, password)."""
+        # Setup the dialog
+        dialog = QtWidgets.QDialog()
+        spacer = QtWidgets.QVBoxLayout()
+        spacer.addWidget(QtWidgets.QLabel('Username'))
+        username = QtWidgets.QLineEdit()
+        spacer.addWidget(username)
+        spacer.addWidget(QtWidgets.QLabel('Password'))
+        password = QtWidgets.QLineEdit()
+        password.setEchoMode(QtWidgets.QLineEdit.Password)
+        spacer.addWidget(password)
+        # Add the close button
+        button = QtWidgets.QPushButton('OK')
+        def ok_click():
+            """Handle the OK button click."""
+            dialog.done(0)
+        button.clicked.connect(ok_click)
+        spacer.addWidget(button)
+        dialog.setLayout(spacer)
+        # Execute it
+        dialog.exec_()
+        return (username.text(), password.text())
+
+    @staticmethod
     def open_about():
         """Open the about menu."""
         desc = (f'<center><h2>{App.get_name()}</h2>'
