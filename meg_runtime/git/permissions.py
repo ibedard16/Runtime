@@ -51,31 +51,13 @@ class Permissions(dict):
             roles.append("default")
         return [(user, users[user]) for user in users.keys()]
 
-    def get_roles(self):
-        """Returns a list of all roles and their permissions"""
-        rolesList = {}
-        self._construct_roles_from_permission(rolesList, 'roles_remove_locks')
-        self._construct_roles_from_permission(rolesList, 'roles_add_locks')
-        self._construct_roles_from_permission(rolesList, 'roles_write')
-        self._construct_roles_from_permission(rolesList, 'roles_grant')
-        self._construct_roles_from_permission(rolesList, 'roles_modify_roles')
-        return rolesList
-    
-    def _construct_roles_from_permission(self, rolesList, permissionName):
-        """Adds any roles present in the permissionName to the rolesList"""
-        for roleName in self['general'][permissionName]:
-            if (rolesList.get(roleName) is not None):
-                rolesList.get(roleName).give_permission(permissionName)
-            else:
-                rolesList[roleName] = Role(roleName, [permissionName])
-
     def can_lock(self, user):
         """Return True if the current user can lock a specific path"""
         return self._general_check(user, 'roles_add_locks', 'users_add_locks')
 
     def can_write(self, user, path):
         """Return True if the current user can write to a specific path"""
-        roles = self.get_roles_for_user(user)
+        roles = self.get_roles(user)
         fileHasPermissions = path in self['files']
         # Read only file flag denies global write permissions, allows write for file specific write permissions
         readOnly = fileHasPermissions and self['files'][path]['read_only']
@@ -117,11 +99,6 @@ class Permissions(dict):
                     self["roles"][role].remove(targetUser)
                     return True
         return False
-
-    # def save_role_list(self, user, roleList):
-    #     if not self.can_modify_roles(user):
-    #         return False
-    #     self["roles"]
 
     def create_role(self, user, role):
         """If user is allowd to modify roles, create the role. Cannot create existing role
@@ -228,7 +205,7 @@ class Permissions(dict):
         return False
 
     def _general_check(self, user, roleKey, userKey):
-        roles = self.get_roles_for_user(user)
+        roles = self.get_roles(user)
         for role in roles:
             if role in self['general'][roleKey]:
                 return True
@@ -276,7 +253,7 @@ class Permissions(dict):
             # Log that loading the configuration failed
             Logger.info('MEG PERMISSIONS: Could not load permissions file <' + self.__path + '>, using default permissions')
 
-    def get_roles_for_user(self, user):
+    def get_roles(self, user):
         """Get a list of roles applied to given user"""
         roles = [role for role in self['roles']
                  if user in self['roles'][role]]
