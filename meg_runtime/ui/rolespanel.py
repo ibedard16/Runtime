@@ -22,6 +22,12 @@ class RolesPanel(BasePanel):
     def on_load(self):
         """Load static elements within the panel"""
         self.attach_ui_elements()
+        (username, password) = App.open_credential_dialog()
+        if not self._permissions.can_modify_roles(username):
+            QtWidgets.QMessageBox().critical(App.get_window(), App.get_name(), 'Cannot delete the default role, it is the role everyone has by default!')
+            App.get_window().remove_view(self)
+        self._user = username
+
     
     def on_show(self):
         """Load dynamic elements within the panel"""
@@ -63,12 +69,12 @@ class RolesPanel(BasePanel):
 
     def open_add_role(self):
         """Opens the panel to add a new role"""
-        App.get_window().popup_view(ui.RoleEditPanel(self._permissions, 'new role', True))
+        App.get_window().popup_view(ui.RoleEditPanel(self._user, self._permissions, 'new role', True))
 
     def open_edit_role(self):
         """Opens the panel to edit a specific role"""
         currentRole = self._get_current_role()
-        App.get_window().popup_view(ui.RoleEditPanel(self._permissions, currentRole, False))
+        App.get_window().popup_view(ui.RoleEditPanel(self._user, self._permissions, currentRole, False))
 
     def delete_role(self):
         """removes the role from the list"""
@@ -76,7 +82,7 @@ class RolesPanel(BasePanel):
         if currentRole == 'default':
             QtWidgets.QMessageBox().critical(App.get_window(), App.get_name(), 'Cannot delete the default role, it is the role everyone has by default!')
             return
-        self._permissions.delete_role('user', currentRole) #todo: use actual user name
+        self._permissions.delete_role(self._user, currentRole) #todo: use actual user name
         self.load_roles()
         self.edit_button.setEnabled(False)
         self.delete_button.setEnabled(False)

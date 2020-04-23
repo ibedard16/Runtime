@@ -5,8 +5,9 @@ from meg_runtime.ui.basepanel import BasePanel
 
 class RoleEditPanel(BasePanel):
 
-    def __init__(self, permissions, role, addNewRole, **kwargs):
+    def __init__(self, user, permissions, role, addNewRole, **kwargs):
         super().__init__(**kwargs)
+        self._user = user
         self._permissions = permissions
         self._role = role
         self._addNewRole = addNewRole
@@ -50,25 +51,23 @@ class RoleEditPanel(BasePanel):
             QtWidgets.QMessageBox().critical(App.get_window(), App.get_name(), errorMessage)
 
     def _add_new_role(self):
-        # TODO: Use actual user name in all methods called
         self._role = self._role_name_edit.text()
-        self._permissions.create_role('user', self._role) 
+        self._permissions.create_role(self._user, self._role) 
         if self._add_locks_box.isChecked():
-            self._permissions.add_role_permission('user', self._role, 'roles_add_locks')
+            self._permissions.add_role_permission(self._user, self._role, 'roles_add_locks')
         if self._remove_locks_box.isChecked():
-            self._permissions.add_role_permission('user', self._role, 'roles_remove_locks')
+            self._permissions.add_role_permission(self._user, self._role, 'roles_remove_locks')
         if self._modify_files_box.isChecked():
-            self._permissions.add_role_permission('user', self._role, 'roles_write')
+            self._permissions.add_role_permission(self._user, self._role, 'roles_write')
         if self._grant_permissions_box.isChecked():
-            self._permissions.add_role_permission('user', self._role, 'roles_grant')
+            self._permissions.add_role_permission(self._user, self._role, 'roles_grant')
         if self._modify_roles_box.isChecked():
-            self._permissions.add_role_permission('user', self._role, 'roles_modify_roles')
+            self._permissions.add_role_permission(self._user, self._role, 'roles_modify_roles')
 
     def _edit_existing_role(self):
-        # TODO: Use actual user name in all methods called
         editedRoleName = self._role_name_edit.text()
         if self._role != editedRoleName:
-            renameSucceeded = self._permissions.rename_role('user', self._role, editedRoleName)
+            renameSucceeded = self._permissions.rename_role(self._user, self._role, editedRoleName)
             if renameSucceeded:
                 self._role = editedRoleName
             else:
@@ -81,11 +80,10 @@ class RoleEditPanel(BasePanel):
         
 
     def _toggle_role_permission_if_changed(self, permissionName, newHasPermission):
-        # TODO: Use actual user name in all methods called
         oldHasPermission = self._permissions.does_role_have_permission(self._role, permissionName)
         if oldHasPermission != newHasPermission:
             if newHasPermission:
-                self._permissions.add_role_permission('user', self._role, permissionName)
+                self._permissions.add_role_permission(self._user, self._role, permissionName)
             else:
-                self._permissions.remove_role_permission('user', self._role, permissionName)
+                self._permissions.remove_role_permission(self._user, self._role, permissionName)
 
