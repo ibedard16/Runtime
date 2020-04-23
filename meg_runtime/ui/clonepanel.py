@@ -1,7 +1,6 @@
 
 from PyQt5 import QtWidgets
 from meg_runtime.app import App
-from meg_runtime.config import Config
 from meg_runtime.logger import Logger
 from meg_runtime.git import GitManager
 from meg_runtime.ui.basepanel import BasePanel

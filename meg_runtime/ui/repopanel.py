@@ -4,7 +4,6 @@ import platform
 import subprocess
 from PyQt5 import QtWidgets
 from meg_runtime.app import App
-from meg_runtime.config import Config
 from meg_runtime.logger import Logger
 from meg_runtime.ui.basepanel import BasePanel
 from meg_runtime.ui.filechooser import FileChooser
@@ -35,7 +34,7 @@ class RepoPanel(BasePanel):
         """Send changes for the given repo."""
         if self._repo is not None:
             self._repo.push()
-        
+
     def manage_roles(self):
         """Manage roles for the given repo"""
         if self._repo is not None:

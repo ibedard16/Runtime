@@ -7,6 +7,7 @@ import json
 import os
 from meg_runtime.logger import Logger
 
+
 class Permissions(dict):
     """Permissions manager - one for each repository"""
 

@@ -3,6 +3,7 @@ from PyQt5 import QtWidgets
 from meg_runtime.app import App
 from meg_runtime.ui.basepanel import BasePanel
 
+
 class RoleEditPanel(BasePanel):
 
     def __init__(self, user, permissions, role, addNewRole, **kwargs):
@@ -11,7 +12,7 @@ class RoleEditPanel(BasePanel):
         self._permissions = permissions
         self._role = role
         self._addNewRole = addNewRole
-    
+
     def on_load(self):
         instance = self.get_widgets()
         self._role_name_edit = instance.findChild(QtWidgets.QLineEdit, 'roleNameEdit')
@@ -25,11 +26,11 @@ class RoleEditPanel(BasePanel):
         self._applyButton.clicked.connect(self.apply)
         self._cancelButton = instance.findChild(QtWidgets.QPushButton, 'cancelButton')
         self._cancelButton.clicked.connect(self.cancel)
-    
+
     def on_show(self):
         self._popup = App.get_window().get_current_popup()
         self._role_name_edit.setText(self._role)
-        self._role_name_edit.setEnabled(self._role != 'default') # cannot change the name of the default role
+        self._role_name_edit.setEnabled(self._role != 'default')  # cannot change the name of the default role
         self._add_locks_box.setChecked(self._permissions.does_role_have_permission(self._role, 'roles_add_locks'))
         self._remove_locks_box.setChecked(self._permissions.does_role_have_permission(self._role, 'roles_remove_locks'))
         self._modify_files_box.setChecked(self._permissions.does_role_have_permission(self._role, 'roles_write'))
@@ -43,7 +44,7 @@ class RoleEditPanel(BasePanel):
         errorMessage = None
         if self._addNewRole:
             errorMessage = self._add_new_role()
-        else: 
+        else:
             errorMessage = self._edit_existing_role()
         if errorMessage is None:
             self._popup.accept()
@@ -52,7 +53,7 @@ class RoleEditPanel(BasePanel):
 
     def _add_new_role(self):
         self._role = self._role_name_edit.text()
-        self._permissions.create_role(self._user, self._role) 
+        self._permissions.create_role(self._user, self._role)
         if self._add_locks_box.isChecked():
             self._permissions.add_role_permission(self._user, self._role, 'roles_add_locks')
         if self._remove_locks_box.isChecked():
@@ -77,7 +78,6 @@ class RoleEditPanel(BasePanel):
         self._toggle_role_permission_if_changed('roles_write', self._modify_files_box.isChecked())
         self._toggle_role_permission_if_changed('roles_grant', self._grant_permissions_box.isChecked())
         self._toggle_role_permission_if_changed('roles_modify_roles', self._modify_roles_box.isChecked())
-        
 
     def _toggle_role_permission_if_changed(self, permissionName, newHasPermission):
         oldHasPermission = self._permissions.does_role_have_permission(self._role, permissionName)
@@ -86,4 +86,3 @@ class RoleEditPanel(BasePanel):
                 self._permissions.add_role_permission(self._user, self._role, permissionName)
             else:
                 self._permissions.remove_role_permission(self._user, self._role, permissionName)
-

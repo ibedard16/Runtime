@@ -4,9 +4,7 @@ from PyQt5 import QtWidgets
 
 from meg_runtime.app import App
 from meg_runtime import ui
-from meg_runtime.ui.manager import UIManager
 from meg_runtime.ui.basepanel import BasePanel
-
 
 
 class RolesPanel(BasePanel):
@@ -28,7 +26,6 @@ class RolesPanel(BasePanel):
             App.get_window().remove_view(self)
         self._user = username
 
-    
     def on_show(self):
         """Load dynamic elements within the panel"""
         self.load_roles()
@@ -82,7 +79,7 @@ class RolesPanel(BasePanel):
         if currentRole == 'default':
             QtWidgets.QMessageBox().critical(App.get_window(), App.get_name(), 'Cannot delete the default role, it is the role everyone has by default!')
             return
-        self._permissions.delete_role(self._user, currentRole) #todo: use actual user name
+        self._permissions.delete_role(self._user, currentRole)
         self.load_roles()
         self.edit_button.setEnabled(False)
         self.delete_button.setEnabled(False)
