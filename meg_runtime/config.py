@@ -123,6 +123,47 @@ class Config(dict):
             return False
         return True
 
+    # Dump a configuration to JSON string
+    @staticmethod
+    def dump():
+        """Dump a configuration to JSON string"""
+        # Check there is a configuration instance
+        if Config.__instance is None:
+            Config()
+        if Config.__instance is None:
+            return False
+        try:
+            # Remove the blocked keys from being saved
+            config_copy = copy.deepcopy(Config.__instance)
+            for blocked_key in Config.__blocked_keys:
+                config_copy._remove(config_copy, [sk for sk in blocked_key.split('/') if sk])
+            # Try to convert configuration to JSON file
+            return json.dumps(config_copy, indent=2)
+        except Exception as e:
+            # Log that dumping the configuration failed
+            Logger.warning(f'MEG Config: {e}')
+        return ''
+
+    # Replace a configuration from a JSON string
+    @staticmethod
+    def replace(str):
+        """Replace a configuration from a JSON string"""
+        # Check there is a configuration instance
+        if Config.__instance is None:
+            Config()
+        if Config.__instance is None:
+            return False
+        try:
+            values = json.loads(str)
+            super(Config, Config.__instance).clear()
+            Config.__instance.update(values)
+            Config.__instance._set_defaults()
+            return True
+        except Exception as e:
+            # Log that updating the configuration failed
+            Logger.warning(f'MEG Config: {e}')
+        return False
+
     # Expand a configuration value with configuration references
     @staticmethod
     def expand(value, exclude_keys=[]):

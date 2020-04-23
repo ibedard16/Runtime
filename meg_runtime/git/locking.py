@@ -156,7 +156,6 @@ class Locking:
             (bool): False if lockfile cannot be read
         """
         self.__lockData = {}
-        self._generateLockFile()
         data = None
         try:
             with open(self.__path, 'r') as lockfile:
@@ -165,6 +164,9 @@ class Locking:
         except json.decoder.JSONDecodeError:
             Logger.warning("MEG Locking: Unable to read contents of lock file at {0}".format(self.__path))
             return False
+        except FileNotFoundError:
+            Logger.info("MEG Locking: Lock file doesn't yet exist at {0}".format(self.__path))
+            return True
         if data is not None:
             self.__lockData = data
         return True

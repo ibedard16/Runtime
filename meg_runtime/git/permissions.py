@@ -275,7 +275,6 @@ class Permissions(dict):
         except FileNotFoundError:
             # Log that loading the configuration failed
             Logger.info('MEG PERMISSIONS: Could not load permissions file <' + self.__path + '>, using default permissions')
-            self.save()
 
     def get_roles_for_user(self, user):
         """Get a list of roles applied to given user"""
@@ -283,3 +282,19 @@ class Permissions(dict):
                  if user in self['roles'][role]]
         roles.insert(0, "default")
         return roles
+
+    def rename_role(self, user, role, newRoleName):
+        """Rename role, cannot rename default"""
+        if self.can_modify_roles(user) and role in self["roles"] and newRoleName not in self["roles"] and role != "default" and newRoleName != "default":
+            for permission in Permissions.ROLE_PERMISSIONS:
+                if role in self["general"][permission]:
+                    self["general"][permission].remove(role)
+                    self["general"][permission].append(newRoleName)
+            for path in self["files"]:
+                if role in self["files"][path]["roles_write"]:
+                    self["files"][path]["roles_write"].remove(role)
+                    self["files"][path]["roles_write"].append(newRoleName)
+            self["roles"][newRoleName] = self["roles"][role]
+            del self["roles"][role]
+            return True
+        return False
