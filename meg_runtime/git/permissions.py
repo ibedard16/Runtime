@@ -6,7 +6,6 @@ All users always have the default role. All permissions can be removed from the 
 import json
 import os
 from meg_runtime.logger import Logger
-from meg_runtime.git.role import Role
 
 class Permissions(dict):
     """Permissions manager - one for each repository"""
@@ -157,6 +156,9 @@ class Permissions(dict):
                     self["files"][path][key].remove(role)
             return True
         return False
+
+    def does_role_have_permission(self, role, permissionKey):
+        return role in self['general'][permissionKey]
 
     def add_user_permission(self, user, targetUser, key, path=None):
         """Add a permission to a user
