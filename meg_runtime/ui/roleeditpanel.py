@@ -27,53 +27,65 @@ class RoleEditPanel(BasePanel):
     
     def on_show(self):
         self._popup = App.get_window().get_current_popup()
-        self._role_name_edit.setText(self._role.name)
-        self._role_name_edit.setEnabled(self._addNewRole)
-        self._add_locks_box.setChecked(self._role.can_add_lock)
-        self._remove_locks_box.setChecked(self._role.can_remove_lock)
-        self._modify_files_box.setChecked(self._role.can_write)
-        self._grant_permissions_box.setChecked(self._role.can_grant_permissions)
-        self._modify_roles_box.setChecked(self._role.can_modify_roles)
-
-    def apply(self):
-        self._role.name = self._role_name_edit.text()
-        self._role.can_add_lock = self._add_locks_box.isChecked()
-        self._role.can_remove_lock = self._remove_locks_box.isChecked()
-        self._role.can_write = self._modify_files_box.isChecked()
-        self._role.can_grant_permissions = self._grant_permissions_box.isChecked()
-        self._role.can_modify_roles = self._modify_roles_box.isChecked()
-        if self._addNewRole:
-            self._permissions.create_role('user', self._role.name) # TODO: Use actual name
-        self.apply_roles()
-        self._popup.accept()
-
-    def apply_roles(self):
-        # TODO: Use actual user name
-        # can add lock
-        if self._role.can_add_lock:
-            self._permissions.add_role_permission('user', self._role.name, 'roles_add_locks')
-        else:
-            self._permissions.remove_role_permission('user', self._role.name, 'roles_add_locks')
-        # can remove lock
-        if self._role.can_remove_lock:
-            self._permissions.add_role_permission('user', self._role.name, 'roles_remove_locks')
-        else:
-            self._permissions.remove_role_permission('user', self._role.name, 'roles_remove_locks')
-        # can write
-        if self._role.can_write:
-            self._permissions.add_role_permission('user', self._role.name, 'roles_write')
-        else:
-            self._permissions.remove_role_permission('user', self._role.name, 'roles_write')
-        # can grant permission
-        if self._role.can_grant_permissions:
-            self._permissions.add_role_permission('user', self._role.name, 'roles_grant')
-        else:
-            self._permissions.remove_role_permission('user', self._role.name, 'roles_grant')
-        # can modify roles
-        if self._role.can_modify_roles:
-            self._permissions.add_role_permission('user', self._role.name, 'roles_modify_roles')
-        else:
-            self._permissions.remove_role_permission('user', self._role.name, 'roles_modify_roles')
+        self._role_name_edit.setText(self._role)
+        self._role_name_edit.setEnabled(self._role != 'default') # cannot change the name of the default role
+        self._add_locks_box.setChecked(self._permissions.does_role_have_permission(self._role, 'roles_add_locks'))
+        self._remove_locks_box.setChecked(self._permissions.does_role_have_permission(self._role, 'roles_remove_locks'))
+        self._modify_files_box.setChecked(self._permissions.does_role_have_permission(self._role, 'roles_write'))
+        self._grant_permissions_box.setChecked(self._permissions.does_role_have_permission(self._role, 'roles_grant'))
+        self._modify_roles_box.setChecked(self._permissions.does_role_have_permission(self._role, 'roles_modify_roles'))
 
     def cancel(self):
         self._popup.reject()
+
+    def apply(self):
+        errorMessage = None
+        if self._addNewRole:
+            errorMessage = self._add_new_role()
+        else: 
+            errorMessage = self._edit_existing_role()
+        if errorMessage is None:
+            self._popup.accept()
+        else:
+            QtWidgets.QMessageBox().critical(App.get_window(), App.get_name(), errorMessage)
+
+    def _add_new_role(self):
+        # TODO: Use actual user name in all methods called
+        self._role = self._role_name_edit.text()
+        self._permissions.create_role('user', self._role) 
+        if self._add_locks_box.isChecked():
+            self._permissions.add_role_permission('user', self._role, 'roles_add_locks')
+        if self._remove_locks_box.isChecked():
+            self._permissions.add_role_permission('user', self._role, 'roles_remove_locks')
+        if self._modify_files_box.isChecked():
+            self._permissions.add_role_permission('user', self._role, 'roles_write')
+        if self._grant_permissions_box.isChecked():
+            self._permissions.add_role_permission('user', self._role, 'roles_grant')
+        if self._modify_roles_box.isChecked():
+            self._permissions.add_role_permission('user', self._role, 'roles_modify_roles')
+
+    def _edit_existing_role(self):
+        # TODO: Use actual user name in all methods called
+        editedRoleName = self._role_name_edit.text()
+        if self._role != editedRoleName:
+            renameSucceeded = self._permissions.rename_role('user', self._role, editedRoleName)
+            if renameSucceeded:
+                self._role = editedRoleName
+            else:
+                return f'Cannot rename role, a role with name: "{self._role}" already exists'
+        self._toggle_role_permission_if_changed('roles_add_locks', self._add_locks_box.isChecked())
+        self._toggle_role_permission_if_changed('roles_remove_locks', self._remove_locks_box.isChecked())
+        self._toggle_role_permission_if_changed('roles_write', self._modify_files_box.isChecked())
+        self._toggle_role_permission_if_changed('roles_grant', self._grant_permissions_box.isChecked())
+        self._toggle_role_permission_if_changed('roles_modify_roles', self._modify_roles_box.isChecked())
+        
+
+    def _toggle_role_permission_if_changed(self, permissionName, newHasPermission):
+        # TODO: Use actual user name in all methods called
+        oldHasPermission = self._permissions.does_role_have_permission(self._role, permissionName)
+        if oldHasPermission != newHasPermission:
+            if newHasPermission:
+                self._permissions.add_role_permission('user', self._role, permissionName)
+            else:
+                self._permissions.remove_role_permission('user', self._role, permissionName)
+
